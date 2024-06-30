@@ -1,0 +1,67 @@
+<%- include('partials/head.ejs') %>
+<link rel="stylesheet" href="/mobileDetails.css">
+<body>
+    <div class="leftContainer"></div>
+    <div class="mainBody">
+        <div class="infoContainer">
+            <div class="imgContainer">
+                <div class="secondImgContainer">
+                    <img src="<%=foundTeacher.imageURL%>" alt="">
+                </div>
+            </div>
+            <div class="teacherInfo">
+                <div class="teacherFirstName">
+                
+                    <span><%=foundTeacher.firstname%></span>
+                </div>
+                <div class="teacherLastName">
+                    <span><%=foundTeacher.lastname%></span>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="questionsContainer">
+            <div class="innerQuestions">
+                <ol>
+                    <%for(let question of questions){%>
+                    <li><%=question.text%></li>
+                <form action="/<%=id%>/instructors/<%=teacherId%>/evaluate" method="POST">
+
+                    <div class="answerContainer">
+                    <%if(question.noMessage === true){%>
+
+                        <label for="1 <%=question._id%>">1</label>
+                        <input type="radio" id="1 <%=question._id%>" value="1" name="<%=question._id%> ">
+
+                        <label for="2 <%=question._id%>">2</label>
+                        <input type="radio" id="2 <%=question._id%>" value="2" name="<%=question._id%> ">
+
+                        <label for="3 <%=question._id%>">3</label>
+                        <input type="radio" id="3 <%=question._id%>" value="3" name="<%=question._id%> ">
+
+                        <label for="4 <%=question._id%>">4</label>
+                        <input type="radio" id="4 <%=question._id%>" value="4" name="<%=question._id%> ">
+
+                        <label for="5 <%=question._id%>">5</label>
+                        <input type="radio" id="5 <%=question._id%>" value="5" name="<%=question._id%> ">
+                    <%}else{%>
+                        <textarea name="<%=question._id%>" id="" cols="30" rows="10" ></textarea>
+                    <%}%>
+                    </div>
+                    
+                    <%}%>
+                    <div class="buttonContainer">
+                        <button>submit</button>
+
+                    </div>
+
+                </ol>
+                
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="rightContainer"></div>
+</body>
+</html>

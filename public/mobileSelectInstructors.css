@@ -1,0 +1,137 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inter;
+}
+body{
+    height: 100vh;
+    overflow: hidden;
+    background-color: white;
+    display: flex;
+}
+
+
+.formBody{
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    overflow: hidden;
+    position: relative
+}
+
+.leftStripe{
+    height: 400px;
+    width: 50px;
+    background-color: #a81e22;
+    position: absolute;
+    transform: rotate(140deg);
+    bottom: -150px;
+}
+.leftStripe:nth-of-type(2){
+    bottom: -170px;
+    height: 700px;
+}
+
+.rightStripe {
+    height: 400px;
+    width: 50px;
+    background-color: #f8d30a;
+    position: absolute;
+    transform: rotate(140deg);
+    top: -150px;
+    right: 0;
+}
+
+.rightStripe2 {
+    height: 400px;
+    width: 50px;
+    background-color: #f8d30a;
+    position: absolute;
+    transform: rotate(140deg);
+    right: 0;
+    top: -170px;
+    height: 700px;
+}
+
+
+.mainForm{
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    border: 3px solid black;
+    margin: 50px auto;
+    position: relative;
+    border-radius: 10px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: -10px 10px 10px rgba(0, 0, 0, .4);
+}
+
+.mainForm h1{
+    width: 90%;
+    height: 70px;
+    border-bottom: 3px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 20px;
+    font-size: 40px;
+}
+
+.teacherListContainer{
+    width: 90%;
+    height: 80%;
+    background-color: white;
+    border: 3px solid black;
+    border-radius: 10px;
+    margin: auto auto;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.eachTeacher{
+    margin: 5px;
+    border: 2px solid black;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    letter-spacing: 3px;
+    cursor: pointer;
+    justify-content: space-between;
+}
+
+.eachTeacher p{
+    margin-left: 10px;
+    font-size: 15px;
+}
+.eachTeacher a{
+    text-decoration: none;
+    color: black;
+}
+.eachTeacher span{
+    font-size: 12px;
+}
+
+
+
+
+
+@media(min-width:600px){
+   body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   }
+
+
+    .formBody{
+        width: 500px;
+        height: 100%;
+        box-shadow: 0 0 100px rgba(0, 0, 0, .9);
+
+    }
+}

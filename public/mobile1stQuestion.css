@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inter;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden;
+    background-color: white;
+    display: flex;
+}
+
+
+.formBody {
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.leftStripe {
+    height: 400px;
+    width: 50px;
+    background-color: #a81e22;
+    position: absolute;
+    transform: rotate(140deg);
+    bottom: -150px;
+}
+
+.leftStripe:nth-of-type(2) {
+    bottom: -170px;
+    height: 700px;
+}
+
+.rightStripe {
+    height: 400px;
+    width: 50px;
+    background-color: #f8d30a;
+    position: absolute;
+    transform: rotate(140deg);
+    top: -150px;
+    right: 0;
+}
+
+.rightStripe2 {
+    height: 400px;
+    width: 50px;
+    background-color: #f8d30a;
+    position: absolute;
+    transform: rotate(140deg);
+    right: 0;
+    top: -170px;
+    height: 700px;
+}
+
+
+.mainForm {
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    border: 3px solid black;
+    margin: 50px auto;
+    position: relative;
+    border-radius: 10px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: -10px 10px 10px rgba(0, 0, 0, .4);
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.mainForm form{
+    margin-left: 40px;
+}
+
+.questionCategoryContainer{
+    margin: 5% 0;
+    width: 90% ;
+    height: auto;
+    border: 2px solid black;
+    padding: 10px 0;
+    border-radius: 5px;
+}
+.questionCategoryName{
+    margin: 2%;
+    border-bottom: 1px solid black;
+}
+.questionCategoryName span{
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: bolder;
+}
+.questionsContainer{
+    width: 90%;
+    height: 30px;
+    margin: 10px auto;
+    height: auto;
+    border-bottom: 1px solid;
+
+}
+
+.questionText{
+    font-size: 15px;
+    font-weight: 300;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+}
+.questionText span{
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+.questionRadio{
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.radioContainer{
+    width: 40px;
+    margin: 5px;
+}
+.radioContainer label{
+    margin-right: 5px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.submitButton{
+    width: 70px;
+    height: 70px;
+    border: 1px solid black;
+    border-radius: 50%;
+    position: fixed;
+    display: flex;
+    justify-content: center ;
+    align-items: center;
+    cursor: pointer;
+    right: 750px;
+    bottom: 20px;
+    transition: all .15s;
+}
+.submitButton button{
+    color: white;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background-color: #43793a;
+    border: 0;
+    font-size: 18px;
+}
+
+.submitButton:hover{
+    transform: translateY(-3px);
+}
+
+
+
+
+
+
+@media(min-width:600px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .formBody {
+        width: 500px;
+        height: 100%;
+        box-shadow: 0 0 100px rgba(0, 0, 0, .9);
+
+    }
+}

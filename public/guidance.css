@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inter;
+}
+
+
+body {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+.leftStripe {
+    height: 400px;
+    width: 60px;
+    position: absolute;
+    background-color: #a81e22;
+    transform: rotate(140deg);
+    bottom: -90px;
+}
+
+.leftStripe:nth-of-type(2) {
+    left: 60px;
+    height: 600px;
+}
+
+.rightStripe {
+    z-index: -1;
+    height: 400px;
+    width: 60px;
+    position: absolute;
+    background-color: #f8d30a;
+    right: 0;
+    top: -90px;
+    transform: rotate(140deg);
+}
+
+.rightStripe2{
+    z-index: -1;
+    width: 60px;
+    position: absolute;
+    background-color: #f8d30a;
+    top: -90px;
+    transform: rotate(140deg);
+    right: 60px;
+    height: 600px;
+}
+
+.innerContainer{
+    width: 90%;
+    height: 90%;
+    border: 3px solid black;
+    margin:auto auto;
+    z-index: 1;
+    background-color: white;
+    border-radius: 15px;
+}
+
+.settingsContainer{
+    height: 75px;
+    border-bottom: 3px solid black;
+    align-items: center;
+    display: flex;
+    margin: 0 10px;
+}
+.settingsContainer select{
+    width: 170px;
+}
+.settingsContainer label{
+    margin-left: 50px;
+    margin-right: 15px;
+}
+
+.contentsContainer{
+    height: calc(100% - 75px);
+    padding: 15px 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 250px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.eachEvaluation{
+    height: 200px;
+    width: 200px;
+    background-color: white;
+    margin: 20px 15px;
+    transition: .25s all;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, .4);
+    position: relative;
+}
+.eachEvaluation span{
+    font-size: 25px;
+}
+.eachEvaluation:hover{
+    transform: translateY(-5px);
+    box-shadow: -10px 10px 20px rgba(0, 0, 0, .4);
+}
+
+.eachEvaluation button{
+    position: absolute;
+    bottom: -40px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.teachersSelectContainer{
+    width: 400px;
+    display: flex;
+}

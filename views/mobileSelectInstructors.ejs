@@ -1,0 +1,34 @@
+
+<%- include('partials/head.ejs') %>
+
+
+<link rel="stylesheet" href="/mobileSelectInstructors.css">
+
+<body>
+    <div class="formBody">
+        <div class="leftStripe"></div>
+        <div class="leftStripe"></div>
+
+        <div class="mainForm">
+            <h1>Select Instructors</h1>
+            <div class="teacherListContainer">
+                <% teacherSubjectPairs.forEach(pair=> { %>
+                    <div class="eachTeacher">
+                        <a href="http://localhost:3100/<%= studentId %>/instructors/<%= pair._id %>/<%= pair.subject.code %>/evaluate">
+                            <p>
+                                <%= pair.fullname %>
+                            </p>
+                        </a>
+                        <span>- <%= pair.subject.code %></span>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+
+        <div class="rightStripe"></div>
+        <div class="rightStripe2"></div>
+    </div>
+</body>
+
+
+</html>

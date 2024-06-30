@@ -1,0 +1,74 @@
+<%- include('partials/head.ejs') %>
+<link rel="stylesheet" href="/showEvaluation.css">
+
+<body>
+    <div class="leftBackgroundStylesContainer">
+        <div class="leftHtuLogoContainer">
+            <img src="/images/htulogo.png" alt="">
+        </div>
+        <div class="leftStripesContainer">
+            <div class="leftStripe"></div>
+            <div class="leftStripe"></div>
+
+        </div>
+    </div>
+    <div class="leftContainer">
+        <div class="innerLeftContainer">
+            <h1>Instructors</h1>
+            <div class="teacherListContainer">
+                <ol>
+                   
+                        <%for(let teacher of foundInstruct){%>
+                            <div class="teacherList">
+                                <li class="nameOfTheTeacher"><%=teacher.firstname%> <%=teacher.lastname%></li>
+                            </div>
+
+                            <%}%>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <div class="rightContainer">
+        <div class="innerRightContainer">
+            <h1 id="selectedTeacher"></h1>
+            <div class="evaluationInfo">
+                <div class="scoreContainer">
+                    <div class="numbersContainer">
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                    </div>
+                </div>
+                <div class="questionsContainer">
+                    
+                   
+                </div>
+                <div class="totalContainer">
+                    <div class="totalTextContainer">
+                        <h2>TOTAL: </h2>
+                    </div>
+                    <div class="totalListScores">
+                        <span id="total1"></span>
+                        <span id="total2"></span>
+                        <span id="total3"></span>
+                        <span id="total4"></span>
+                        <span id="total5"></span>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+    <div class="rightBackgroundStylesContainer">
+        <div class="rightStripe"></div>
+        <div class="rightStripe"></div>
+
+    </div>
+    
+
+
+</body>
+<script src="/js/facShowEval.js"></script>
+</html>

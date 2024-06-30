@@ -1,0 +1,20 @@
+<%- include('partials/head.ejs') %>
+
+<body>
+    <form action="/<%=id%>/instructors/<%=foundTeacher.name%>" method="POST">
+    <h1><%=foundTeacher.name%></h1>
+
+    <ol>
+        <%for(let question of questions){%>
+            <%if(question.noMessage === true){%>
+                <li><%=question.text%> <input type="radio" name="<%=question._id%>" value="1"> <input type="radio" name="<%=question._id%>" value="2"> <input type="radio" name="<%=question._id%>" value="3"> <input type="radio" name="<%=question._id%>" value="4"> <input type="radio" name="<%=question._id%>" value="5"></li>
+                <%}else{%>
+                    <li><%=question.text%> <textarea name="<%=question._id%>" id="" cols="30" rows="10"></textarea></li>
+        <%}}%>
+
+    </ol>
+    
+        <button>Submit</button>
+    </form>
+</body>
+</html>

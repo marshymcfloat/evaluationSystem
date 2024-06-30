@@ -1,0 +1,246 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inter;
+}
+
+body{
+    display: flex;
+    overflow: hidden;
+}
+.leftBackgroundStylesContainer{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.leftHtuLogoContainer{
+    margin: 20px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+.leftHtuLogoContainer img{
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+}
+
+.leftStripe{
+    width: 60px;
+    height: 400px;
+    background-color: #a81f23;
+    transform: rotate(140deg);
+    position: relative;
+    left: 0;
+    bottom: -90px;
+}
+
+
+.leftStripe:nth-of-type(2){
+    transform: rotate(140deg);
+    position: absolute;
+    left: 60px;
+    height: 600px;
+    
+}
+
+
+.leftContainer{
+    height: 100vh;
+        width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    
+}
+
+.innerLeftContainer{
+    top: 100px;
+    left: 40px;
+    position: relative;
+    padding: 20px;
+    width: 90%;
+    height: 70%;
+    border-radius: 10px;
+    box-shadow: -15px 15px 35px rgba(0, 0, 0, 0.6);
+    background-color: white;
+}
+
+.innerLeftContainer h1{
+    height: 125px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 3px solid black;
+}
+.teacherListContainer{
+    height: calc(100% - 125px);
+    width: 450px;
+    margin: 0 auto;
+}
+
+.teacherList{
+    margin: 10px 0;
+    transition: .1s;
+    list-style: none;
+}
+
+.teacherList:hover{
+    background-color: #000000;
+    color: white;
+    transform: translateY(-1px)
+}
+
+.rightContainer{
+height: 100vh;
+    width: calc(100% - 600px);
+display: flex;
+justify-content: center;
+align-items: center;
+position: absolute  ;
+right: 0;
+}
+.innerRightContainer{
+    width: 85%;
+    height: 90%;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: -15px 15px 35px rgba(0,0,0,0.6);
+    background-color: white;
+    z-index: 1;
+}
+.innerRightContainer h1{
+    height: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-bottom: 3px solid black;
+    letter-spacing: 3px;
+}
+
+
+.evaluationInfo{
+    height: calc(100% - 25px);
+    display: flex;
+    flex-direction: column;
+}
+.scoreContainer {
+    height: 60px;
+    display: flex;
+    justify-content: flex-end;
+}
+.numbersContainer {
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.numbersContainer span {
+    height: 100%;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.questionsContainer{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    
+}
+.questionListContainer{
+    margin: 10px 0;
+    display: flex;
+    width: 100%;
+    height: 55px;
+    max-height: 55px;
+
+}
+.questionTextContainer{
+    width: 40%;
+    max-height: 100%;
+    list-style: none;
+}
+
+.questionListScores{
+    width: calc(100% - 40%);
+    display: flex;
+    justify-content: space-between;
+}
+.questionListScores span{
+    height: 100%;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    color: white;
+}
+
+
+.totalContainer{
+    border-top: 3px solid black;
+    height: 60px;
+    width: 100%;
+    display: flex;
+    margin-bottom: 10px;
+}
+.totalTextContainer {
+width: 40%;
+
+}
+.totalTextContainer h2{
+    width: 40%;
+letter-spacing: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.totalListScores{
+    width: calc(100% - 40%);
+    display: flex;
+        justify-content: space-between;
+}
+.totalListScores span{
+    height: 60px;
+        width: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+        color: white;
+}
+
+
+.rightBackgroundStylesContainer {
+    display: flex;
+    right: 0;
+    width: 500px;
+    height: 100%;
+    position: absolute;
+    justify-content: flex-end;
+}
+.rightStripe{
+    width: 60px;
+    height: 400px;
+    background-color: #f8d30a;
+    transform: rotate(140deg);
+    position: absolute;
+    top: -90px;
+}
+.rightStripe:nth-of-type(2){
+    position: absolute;
+        right: 60px;
+        height: 600px;
+}

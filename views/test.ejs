@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="test.css">
+</head>
+<body>
+
+<div class="innerRightContainer">
+    <div class="questionUpperPart">
+        <div class="questionFilterContainer">
+            <label for="questions">Questions: </label>
+            <select name="questionCategory" id="questionCategory">
+                <option value="">SELECT QUESTION CATEGORY</option>
+                <option value="course overview and orientation">COURSE OVERVIEW ORIENTATION</option>
+                <option value="learning outcomes">LEARNING OUTCOMES</option>
+                <option value="assessment">ASSESSMENT</option>
+                <option value="instructional material/content">INSTRUCTIONAL MATERIAL/CONTENT</option>
+                <option value="teacher presence and support">TEACHER PRESENCE AND SUPPORT</option>
+                <option value="learning experiences and interaction">LEARNING EXPERIENCES AND INTERACTION</option>
+                <option value="technology and accessibility">TECHNOLOGY AND ACCESSIBILITY</option>
+            </select>
+        </div>
+    </div>
+    <div class="QuestionlowerPart">
+        <div class="innerQuestionLowerPart">
+        </div>
+    </div>
+
+    <div class="questionAddBtn">
+        <span>+</span>
+    </div>
+</div>
+
+<!-- <div class="removeQuestionModal">
+    <div class="modalBackground"></div>
+    <div class="removeQuestionBody">
+        <div class="removeQuestionTopContainer">
+            <div class="removeQuestionexitButtonContainer">+</div>
+        </div>
+        <div class="removeQuestionBottomContainer">
+            <div class="removeQuestionTextContainer">Are you sure you want to remove this question?</div>
+            <div class="removeQuestionButtonContainer">
+                <button>No</button>
+                <button>Yes</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- <div class="addQuestionModal">
+    <div class="modalBackground"></div>
+    <div class="addQuestionBody">
+        <div class="addQuestionTopContainer">
+            <div class="addQuestionexitButtonContainer">+</div>
+        </div>
+        <div class="addQuestionBottomContainer">
+            <form action="/addQuestion" method="POST">
+            
+                <div class="addQuestionCategoryContainer">
+                    <label for="addQuestionCategory">Question Category: </label>
+                    <select name="addQuestionCategory" id="addQuestionCategory">
+                        <option value="">SELECT QUESTION CATEGORY</option>
+                        <option value="course overview and orientation">COURSE OVERVIEW ORIENTATION</option>
+                        <option value="learning outcomes">LEARNING OUTCOMES</option>
+                        <option value="assessment">ASSESSMENT</option>
+                        <option value="instructional material/content">INSTRUCTIONAL MATERIAL/CONTENT</option>
+                        <option value="teacher presence and support">TEACHER PRESENCE AND SUPPORT</option>
+                        <option value="learning experiences and interaction">LEARNING EXPERIENCES AND INTERACTION</option>
+                        <option value="technology and accessibility">TECHNOLOGY AND ACCESSIBILITY</option>
+                    </select>
+                </div>
+            
+                <div class="addQuestionTextContainer">
+                    <label for="addQuestionText">Question: </label>
+                    <input type="text" placeholder="Please type the question here." name="questionText">
+                    <div class="addQuestionButtonContainer"><button>Save</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+ -->
+
+
+   <!--  <h1>Test page</h1>
+
+    <div class="innerRightContainer">
+
+        <div class="filterOptionsContainer">
+            <div class="innerFilterOptionContainer">
+                <div class="departmentSelect">
+                    <label for="department">Department:<label>
+                    <select name="department" id="department">
+                        <option value="">Select Department</option>
+                        <option value="CET">CET</option>
+                        <option value="CBA">CBA</option>
+                        <option value="CEAA">CEAA</option>
+                        <option value="CHM">CHM </option>
+                        <option value="CNHS">CNHS</option>
+                        <option value="CCJE">CCJE</option>
+
+                    </select>
+                </div>
+
+                <div class="yearSelect">
+                    <label for="year">Year:<label>
+                            <select name="year" id="year">
+                                <option value="1st">1st</option>
+                                <option value="2nd">2nd</option>
+                                <option value="3rd">3rd</option>
+                                <option value="4th">4th </option>
+                            </select>
+                </div>
+
+                <div class="programSelect">
+                    <label for="program">Program:<label>
+                            <select name="program" id="program">
+                                
+                            </select>
+                </div>
+
+                
+                
+            </div>
+
+            <div class="addStudentContainer">
+                <form ref='uploadForm' id='uploadForm' action='/uploadTest' method='post' encType="multipart/form-data">
+                    <input type="file" name="studentFile" class="uploadFile"/>
+                    <input type='submit' value='Add Students' class="uploadButton" disabled/>
+                </form>
+            </div>
+        </div>
+
+        <div class="studentListContainer">
+            <div class="Column">
+                <div class="colName"><p>Name</p></div>
+                <div class="colDepartment"><p>Department</p></div>
+                <div class="colYear"><p>Year</p></div>
+                <div class="colProgram"><p>Program</p></div>    
+            </div>
+
+
+            <div class="innerstudentListContainer">
+
+            </div>
+        </div>
+
+        <div class="deleteStudentsContainer">
+                <button id="removeStudents" disabled>Remove Students</button>
+        </div>
+
+    </div>
+
+     -->
+
+
+<script src="/js/test.js"></script>
+</body>
+</html>
+
+<!-- <div class="confirmModal">
+            <div class="modalBackground"></div>
+            <div class="confirmModalBody">
+                <div class="topContainer">
+                    <div class="exitButtonContainer">+</div>
+                </div>
+                <div class="bottomContainer">
+                    <div class="textContainer">Do you want to remove all students?</div>
+                    <div class="buttonsContainer">
+                        <button>No</button>
+                        <button>Yes</button>
+
+                    </div>
+
+                </div>
+            </div>
+
+    </div> -->

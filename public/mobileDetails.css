@@ -1,0 +1,105 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: inter;
+}
+.leftContainer{
+    position: absolute;
+}
+.mainBody{
+    height: 760px;
+    min-width: 500px;
+    width: 90vw;
+    max-width: 500px;        
+    border: 5px solid black;
+    border-radius: 10px;
+}
+
+.infoContainer{
+    height: 175px;
+    display: flex;
+    border-bottom: 5px solid black;
+}
+.imgContainer{
+    width:250px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.secondImgContainer{
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+}
+.secondImgContainer img{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.teacherInfo{
+    width: 100%;
+    height: 100%;
+    
+}
+.teacherFirstName{
+    height: 50%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.teacherFirstName span{
+    font-size: 40px;
+}
+.teacherLastName{
+    height: 50%;
+}
+.teacherLastName span{
+    font-size:40px;
+    display: flex;
+    justify-content: center;
+}
+.questionsContainer{
+    height: calc(100% - 175px);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    overflow: hidden;
+    background-color: lightblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.innerQuestions{
+    width: 90%;
+    height: 90%;
+}
+.answerContainer{
+    width: 80%;
+    height: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+.answerContainer textarea{
+    width: 100%;
+    height: 50px;
+}
+
+.buttonContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+}
+
+.buttonContainer button{
+    width: 120px;
+    height: 50px;
+    border: 10px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+}

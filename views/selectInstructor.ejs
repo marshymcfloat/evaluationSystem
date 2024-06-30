@@ -1,0 +1,43 @@
+<%- include('partials/head.ejs') %>
+    <link rel="stylesheet" href="../instructors.css">
+
+    <body>
+        <div class="instructorsContainer">
+            <div class="floatingInstructor">
+                <h1>Select Instructors:</h1>
+                <ol>
+                    <% for(let teacher of teachers) { %>
+                    <li class="teacherName" id="<%=teacher._id%>">
+                        <%= teacher.name%>
+
+                    </li>    
+                        <% } %>
+                </ol>
+            </div>
+        </div>
+            <form action='/<%=id%>/instructors/evaluate' method="POST">
+
+        <div class="questionsContainer">
+            <div class="instructorInfo">
+                <div class="imgContainer">
+                    <img src="" alt="" id="instructorImage">
+                </div>
+                <div class="nameContainer">
+                     <span class="nameInfo"> </span>
+                </div>
+            </div>
+            <div class="questions">
+                <ol id="questionsOrderedList">
+
+                </ol>
+                <div class="buttonContainer">
+                    <button>Submit</button>
+                </div>
+            </div>
+        </div>
+            </form>
+
+    </body>
+    <script src="../js/instructors.js"></script>
+
+    </html>

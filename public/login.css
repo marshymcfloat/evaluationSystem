@@ -1,0 +1,162 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+   /*  background-color:rgba(217, 217, 217, .2); */
+    overflow: hidden;
+   
+}
+
+.leftContainer{
+    flex: 1;
+    height: 100vh;
+    position: relative;
+}
+.imgContainer{
+    height: 200px;
+    width: 200px;
+    box-shadow: -8px 8px 5px rgba(0, 0, 0, .5);
+    border-radius:50% ;
+    margin: 20px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.imgContainer img{
+    height: 100%;
+    width: 100%;
+
+}
+.stripe{
+    height: 400px;
+    width: 60px;
+    background-color: #a81e22;
+    transform: rotate(140deg);
+    position: absolute;
+    bottom: -90px;
+    left: 0px;
+}
+.stripe:nth-of-type(2){
+    transform: rotate(140deg);
+    position: absolute;
+    left: 60px;
+    height: 600px;
+}
+
+.loginForm{
+    letter-spacing: 5px;
+    height: 550px;
+    width: 450px;
+    display: flex;
+    flex-direction: column;  
+    border-radius: 10px;
+    border: 5px solid black;
+    background-color: white;
+    box-shadow: 0 20px 25px rgba(0, 0, 0, .5);
+
+    transition: box-shadow .25s, margin-bottom .25s;
+}
+.loginForm:hover{
+    box-shadow: 0 40px 50px rgba(0, 0, 0, .25);
+    margin-bottom: 10px;
+}
+.loginH1{
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.loginH1 h1{
+    margin-top: 50px;
+    
+}
+
+
+.inputContainer{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 220px;
+
+}
+.inputContainer input{
+    height: 60px;
+    width: 350px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 3px black solid;
+    padding: 10px;
+    font-size: 20px;
+    background-color: #a81e22;
+    color: white;
+}
+
+.inputContainer input:nth-of-type(2){
+    background-color: #f8d30b;
+    color: black;
+}
+.inputContainer input::placeholder{
+    color: white;
+}
+.inputContainer input:nth-of-type(2)::placeholder{
+    color: black;
+    
+}
+
+
+.buttonContainer{
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.buttonContainer button{
+    width: 120px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 900;
+    background-color: #42783a;
+    color: white;
+    cursor: pointer;
+    transition: background-color .2s;
+}
+
+.buttonContainer button:hover{
+    background-color: rgba(66, 120, 58, .9);
+}
+.rightContainer{
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Change the flex direction to column */
+    align-items: flex-end;
+    justify-content: flex-start; /* Adjust justify-content to move items to the top */
+    overflow: hidden;
+}
+.stripe2{
+        height: 400px;
+        width: 60px;
+        background-color: #f8d30a;
+        transform: rotate(140deg);
+        position: absolute;
+        top: -80px;
+        right: -8px;
+}
+.stripe2:nth-of-type(2){
+        position: absolute;
+    right: 86px;
+    top:-120px;
+    height: 600px;
+}
+

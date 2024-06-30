@@ -1,0 +1,25 @@
+<%- include('partials/head.ejs') %>
+
+<body>
+    
+<h1>meow meow</h1>
+<form action="/process-excel" method="post" enctype="multipart/form-data">
+    <input type="file" name="excelFile" />
+    <button type="submit">Submit</button>
+</form>
+<form action="/saveStudents" method="POST">
+    <%for(let i=0; i< studentId.length; i++){%>
+        <p>student ID: <%=studentId[i]%> <br>Fullname: <%=studentName[i]%>
+            <br>
+                     Program: <%=studentProgram[i]%>
+                    <br> Department: <%=studentDepartment[i]%>
+                    <br>
+                     Year Level: <%=studentYearLevel%> <br>
+                     Subjects Enrolled: <%=studentEnrolledSubs%>>
+        </p>
+        <%}%>
+            <button>save</button>
+</form>
+
+</body>
+</html>

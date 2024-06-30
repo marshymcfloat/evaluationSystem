@@ -1,0 +1,38 @@
+
+<%- include('partials/head.ejs') %>
+<link rel="stylesheet" href="login.css">
+
+<body>
+    <div class="leftContainer">
+        <div class="imgContainer">
+            <img src="../images/htulogo.png" alt="">
+        </div>
+        <div class="stripe"></div>
+        <div class="stripe"></div>
+
+        
+
+    </div>
+    <div class="loginForm">
+        
+        <div class="loginH1">
+            <h1>InnoValuate</h1>
+        </div>
+        <form action="/login" method="POST">
+            <div class="inputContainer">
+                <input type="text" name="studentId" placeholder="id">
+                <input type="password" name="password" placeholder="password">
+            </div>
+            <div class="buttonContainer">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+    <div class="rightContainer">
+       
+        <div class="stripe2"></div>
+        <div class="stripe2"></div>
+
+    </div>
+</body>
+</html>
