@@ -1,61 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/toBePrinted.css">
-
 </head>
+
 <body>
     <img src="../images/htulogo.png" alt="">
     <h1>Holy Trinity University</h1>
     <h1>Teacher's Evaluation</h1>
-    <p>This is the evaluation result for <span><%=teacherName%></span> in teaching <span><%=subject%></span> from the <span><%=foundTeacher%></span> for
-    the <span><%=evaluation.semester%></span> semester of the <span><%=acadYear%></span> academic year</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Course Overview Orientation</td>
-                    <td><%=evaluation.category1Score%></td>
-                </tr>
-                <tr>
-                    <td>Learning Outcomes</td>
-                    <td><%=evaluation.category2Score%></td>
-                </tr>
-                <tr>
-                    <td>Assessment</td>
-                    <td><%=evaluation.category3Score%></td>
-                </tr>
-                <tr>
-                    <td>Instructional Material/Content</td>
-                    <td><%=evaluation.category4Score%></td>
-                </tr>
-                <tr>
-                    <td>Teacher Presence and Support</td>
-                    <td><%=evaluation.category5Score%></td>
-                </tr>
-                <tr>
-                    <td>Learning Experience and Interaction</td>
-                    <td><%=evaluation.category6Score%></td>
-                </tr>
-                <tr>
-                    <td>Technology and Accessibility</td>
-                    <td><%=evaluation.category7Score%></td>
-                </tr>
-                <tr>
-                    <td>Grand Score</td>
-                    <td><%=evaluation.grandScore%></td>
-                </tr>
-            </tbody>
-        </table>
-        <p>with the average of <span><%=evaluation.grandScore%></span>, you are graded <span><%=gradeEquivalent%></span> for this sem.</p>
+
+    <p>This is the evaluation result for <span>
+            <%= teachername %>
+        </span> from the department of <span>
+            <%= department %>
+        </span>. This evaluation is for <span>
+            <%= semester %>
+        </span> semester academic year of <span>
+            <%= academicYear %>
+        </span>.</p>
+
+    <p>This is the average grade of <span>
+            <%= teachername %>
+        </span> for teaching <span>
+            <%= subject %>
+        </span>.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Course Overview Orientation</td>
+                <td>
+                    <%= evaluation.category1Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Learning Outcomes</td>
+                <td>
+                    <%= evaluation.category2Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Assessment</td>
+                <td>
+                    <%= evaluation.category3Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Instructional Material/Content</td>
+                <td>
+                    <%= evaluation.category4Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Teacher Presence and Support</td>
+                <td>
+                    <%= evaluation.category5Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Learning Experience and Interaction</td>
+                <td>
+                    <%= evaluation.category6Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Technology and Accessibility</td>
+                <td>
+                    <%= evaluation.category7Score %>
+                </td>
+            </tr>
+            <tr>
+                <td>Grand Score</td>
+                <td>
+                    <%= evaluation.grandScore %>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>With the average total score of <span>
+            <%= evaluation.grandScore %>
+        </span>, you are graded <span>
+            <%= gradeEquivalent %>
+        </span> for this semester.</p>
 
 </body>
+
 </html>
+
+
+

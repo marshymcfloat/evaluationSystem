@@ -25,56 +25,24 @@
             <h1 id="options" class="options ">Instructors</h1>
             <h1 id="options" class="options ">Questions</h1>
             <h1 id="options" class="options ">Students</h1>
-            <h1 id="options" class="options ">Time Frame</h1>
+            <h1 id="options" class="options ">Time Frames</h1>
+            <h1 id="options" class="options ">Subjects</h1>
+
 
         </div>
     </div>
 
-    
+
     <div class="rightContainer">
         <div class="innerRightContainer">
+            
+           
 
-            <!-- <div class="timeFrameBody">
-                <form action= '/<%=id%>/setTimeFrame' method="POST">
-                    <div class="startDate">
-                        <label for="startDate">Set starting date: </label>
-                        <input type="date" id="startDate" name="startDate" required>
-                    </div>
-                    <div class="endDate">
-                        <label for="endDate">Set ending date: </label>
-                        <input type="date" id="endDate" name="endDate" required>
-                    </div>
-                    <div class="startTime">
-                        <label for="startTime">Set starting time: </label>
-                        <input type="time" id="startTime" name="startTime" required>
-                    </div>
-                    <div class="endTime">
-                        <label for="endTime">Set ending Time: </label>
-                        <input type="time" id="endTime" name="endTime" required>
-                    </div>
-                    <div class="startAcadYear">
-                        <label for="startAcadYear">Set starting Academic Year: </label>
-                        <input type="number" id="startAcadYear" name="startAcadYear" min="2023" max="2200" required>
-                    </div>
-                    <div class="endAcadYear">
-                        <label for="endTime">Set ending Academic Year: </label>
-                        <input type="number" id="endAcadYear" name="endAcadYear" min="2023" max="2200" required>
+            
 
-                    </div>
-                    <div class="sem">
-                        <label for="sem">Select which semester: </label>
-                        <select name="sem" id="sem">
-                            <option value="1st">1st</option>
-                            <option value="2nd">2nd</option>
-                            <option value="3rd">3rd</option>
-                        </select>
-                    </div>
-                    <div class="timeFrameButtonContainer">
-                        <button type="submit">Save</button>
-                        </form>
-                    </div>
-                        <button id="timeFrameCancel">cancel</button>
-            </div> -->
+
+
+            
               
 
         </div>
@@ -82,20 +50,389 @@
     <div class="rightStripe"></div>
     <div class="rightStripe2"></div>
 
-<!--     <div class="addTeacherModal">
-        <div class="modalBackground"></div>
-        <div class="addTeacherForm">
-            <h1>meow meow</h1>
-        </div>
-    </div> -->
 
 
-   
+    <div class="hidden">
+      
 
-   
+       
+
+        
+    </div>
+
+    <div class="subjectBody">
+        <div class="subjectFilterContainer">
     
+            <div class="subjectDepContainer">
+                <label for="subjectDep">Department: </label>
+                <select name="subjectDep" id="subjectDep">
+                    <option value="">Select Department</option>
+                    <option value="CET">CET</option>
+                    <option value="CBA">CBA</option>
+                    <option value="CEAA">CEAA</option>
+                    <option value="CHM">CHM</option>
+                    <option value="CNHS">CNHS</option>
+                    <option value="CCJE">CCJE</option>
+                </select>
+            </div>
+    
+            <div class="subjectYearContainer">
+                <label for="subjectYear">Year: </label>
+                <select name="subjectYear" id="subjectYear">
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                </select>
+            </div>
+    
+            <div class="subjectProgramContainer">
+                <label for="subjectProgram">Program: </label>
+                <select name="subjectProgram" id="subjectProgram">
+                    <option value="">Select Program</option>
+                </select>
+            </div>
+    
+            <div class="addBulkSubjectsContainer">
+                <form action="/<%=adminId%>/addBulkSubject" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="subjectFile">
+                    <button type="submit" class="uploadButton">Save Subjects</button>
+                </form>
+    
+            </div>
+        </div>
+        <div class="subjectListContainer">
+            <div class="filterCategory">
+                <div class="">Name</div>
+                <div class="">Code</div>
+                <div class="">Year</div>
+                <div class="">Program</div>
+                <div class="filterButton"></div>
+            </div>
+            <div class="filteredSublist">
+    
+            </div>
+    
+    
+    
+    
+    
+    
+        </div>
+    </div>
+    <div class="addIndividualSubjectModal">
+        <div class="modalBackground"></div>
+        <div class="addIndividualSubBody">
+            <div class="upperSubModalContainer">
+                <p>ADD SUBJECT</p>
+                <p id="subModalExitButton">+</p>
+            </div>
+    
+            <div class="bottomSubModalContainer">
+                <form action="/<%=adminId%>/addIndividualSubject" method="POST">
+                    <div class="nameInputContainer">
+                        <label for="">SUBJECT NAME</label>
+                        <input type="text" name="subjectName" required>
+                    </div>
+                    <div class="codeInputContainer">
+                        <label for="">SUBJECT CODE</label>
+                        <input type="text" name="subjectCode" required> 
+                    </div>
+                    <div class="departmentInputContainer">
+                        <label for="" id="subDep">SUBJECT DEPARTMENT</label>
+                        <select name="subjectDepartment" id="subDepSelect" required>
+                            <option value="">SELECT DEPARTMENT</option>
+                            <option value="CET">CET</option>
+                            <option value="CBA">CBA</option>
+                            <option value="CEAA">CEAA</option>
+                            <option value="CHM">CHM</option>
+                            <option value="CNHS">CNHS</option>
+                            <option value="CCJE">CCJE</option>
+                        </select>
+                    </div>
+                    <div class="programInputContainer">
+                        <label for="" id="subProg">SUBJECT PROGRAM</label>
+                        <select name="subjectProgram" id="subProgSelect" required>
+                            
+                        </select>
+                    </div>
+                    <div class="yearInputContainer">
+                        <label for="">SUBJECT YEAR</label>
+                        <select name="subjectYear" id="" required>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                            <option value="3rd">3rd</option>
+                            <option value="4th">4th</option>
+                        </select>
+                    </div>
+        
+                    <div class="addSubButtonContainer"><Button>Add</Button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="updateIndividualSubjectModal">
+        <div class="modalBackground"></div>
+        <div class="updateIndividualSubBody">
+            <div class="upperSubModalContainer">
+                <p>UPDATE SUBJECT</p>
+                <p id="updatesubModalExitButton">+</p>
+            </div>
+    
+            <div class="bottomSubModalContainer">
+                <form action="/<%=adminId%>/updateIndividualSubject" method="POST">
+                    <div class="nameInputContainer">
+                        <label for="">SUBJECT NAME</label>
+                        <input type="text" id="subjectNameUpdate" name="subjectName" required>
+                    </div>
+                    <div class="codeInputContainer">
+                        <label for="">SUBJECT CODE</label>
+                        <input type="text" id='subjectCodeUpdate'name="subjectCode" required>
+                    </div>
+                    <div class="departmentInputContainer">
+                        <label for="" id="subDep">SUBJECT DEPARTMENT</label>
+                        <select name="subjectDepartment" id="updateSubDepSelect" required>
+                            <option value="">SELECT DEPARTMENT</option>
+                            <option value="CET">CET</option>
+                            <option value="CBA">CBA</option>
+                            <option value="CEAA">CEAA</option>
+                            <option value="CHM">CHM</option>
+                            <option value="CNHS">CNHS</option>
+                            <option value="CCJE">CCJE</option>
+                        </select>
+                    </div>
+                    <div class="programInputContainer">
+                        <label for="" id="subProg">SUBJECT PROGRAM</label>
+                        <select name="subjectProgram" id="updateSubProgSelectUpdate" required>
+    
+                        </select>
+                    </div>
+                   
+                    <div class="yearInputContainer">
+                        <label for="">SUBJECT YEAR</label>
+                        <select name="subjectYear" id="updateSubYearSelectUpdate" required>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                            <option value="3rd">3rd</option>
+                            <option value="4th">4th</option>
+                        </select>
+                    </div>
+    
+                    <div class="addSubButtonContainer"><Button>Add</Button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="confirmSubRemoveModal">
+        <div class="modalBackground"></div>
+        <div class="confirmSubRemoveBody">
+            <div class="upperSubRemove">
+                <p>Remove Subject</p>
+                <p id="removeSubExitButton">+</p>
+            </div>
+            <div class="lowerSubRemove">
+                <div class="subRemoveText">
+                    <p>Are you sure you want to remove <span id="toBeRemovedSub">ITIF 102</span>?</p>
+                </div>
+                <div class="subRemoveButtonsContainer">
+                    <button id="subRemoveButtonNo">No</button>
+                    <button id="subRemoveButtonYes">Yes</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="addIndividualStudentModal">
+        <div class="modalBackground"></div>
+        <div class="addIndividualStudentBody">
+
+            <div class="upperAddIndividualStudent">
+                <p>ADD STUDENT</p>
+                <p id="addIndividualStudentExitButton">+</p>
+            </div>
+            <form action="/<%=adminId%>/addIndividualStudent" id="indivStudentForm" method="POST">
+                <div class="lowerAddIndividualStudent">
+                    <div class="individualStudentInputsContainer">
+                        <div class="indivStudentID">
+                            <label for="">Student ID:</label>
+                            <input type="text" name="studentID" id="indivStudentID" required>
+                        </div>
+                        <div class="indivStudentName">
+                            <label for="">Student Name:</label>
+                            <input type="text" id='indivStudentName' name="studentName"required>
+                        </div>
+                        <div class="indivStudentEmail">
+                            <label for="">Student Email:</label>
+                            <input type="email"id='indivStudentEmail' name="studentEmail"required>
+                        </div>
+                        <div class="indivStudentDep">
+                            <label for="">Student Department:</label>
+                            <select  name='studentDepartment' id="indivStudentDepartment" required>
+                                <option value="">SELECT DEPARTMENT</option>
+                                <option value="CET">CET</option>
+                                <option value="CBA">CBA</option>
+                                <option value="CHM">CHM</option>
+                                <option value="CEAA">CEAA</option>
+                                <option value="CNHS">CNHS</option>
+                                <option value="CCJE">CCJE</option>
+                            </select>
+                        </div>
+                        <div class="indivStudentProg">
+                            <label for="">Student Program:</label>
+                            <select name="studentProgram" id="indivStudentProgram" required > 
+
+                            </select>
+                        </div>
+                        <div class="indivStudentYear">
+                            <label for="">Student Year:</label>
+                            <select  name="studentYear" id="indivStudentYear" required>
+                            </select>
+                        </div>
+
+                    
+                        <div class="indivStudentAddedSubjects">
+                            <div class="studentAddedSubs">
+                        
+                            </div>
+                        </div>
+                        <div class="indivStudentToAddSubjects">
+                            <div class="studentToAddSubs">
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="individualStudentButtonContainer">
+                            <button type="submit">ADD</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="updateIndividualStudentModal">
+        <div class="modalBackground"></div>
+        <div class="updateIndividualStudentBody">
+        
+            <div class="upperUpdateIndividualStudent">
+                <p>UPDATE STUDENT</p>
+                <p id="updateIndividualStudentExitButton">+</p>
+            </div>
+            <form action="/<%=adminId%>/updateIndividualStudent" id="updateIndivStudentForm" method="POST">
+                <div class="lowerUpdateIndividualStudent">
+                    <div class="individualStudentInputsContainer">
+                        <div class="indivStudentID">
+                            <label for="">Student ID:</label>
+                            <input type="text" name="studentID" id="updateindivStudentID" required>
+                        </div>
+                        <div class="indivStudentName">
+                            <label for="">Student Name:</label>
+                            <input type="text" id='updateindivStudentName' name="studentName" required>
+                        </div>
+                        <div class="indivStudentEmail">
+                            <label for="">Student Email:</label>
+                            <input type="email" id='updateindivStudentEmail' name="studentEmail" required>
+                        </div>
+                        <div class="indivStudentDep">
+                            <label for="">Student Department:</label>
+                            <select name='studentDepartment' id="updateindivStudentDepartment" required>
+                                <option value="">SELECT DEPARTMENT</option>
+                                <option value="CET">CET</option>
+                                <option value="CBA">CBA</option>
+                                <option value="CHM">CHM</option>
+                                <option value="CEAA">CEAA</option>
+                                <option value="CNHS">CNHS</option>
+                                <option value="CCJE">CCJE</option>
+                            </select>
+                        </div>
+                        <div class="indivStudentProg">
+                            <label for="">Student Program:</label>
+                            <select name="studentProgram" id="updateindivStudentProgram" required>
+        
+                            </select>
+                        </div>
+                        <div class="indivStudentYear">
+                            <label for="">Student Year:</label>
+                            <select name="studentYear" id="updateindivStudentYear" required>
+                            </select>
+                        </div>
+        
+        
+                        <div class="indivStudentAddedSubjects">
+                            <div class="updatestudentAddedSubs">
+        
+                            </div>
+                        </div>
+                        <div class="indivStudentToAddSubjects">
+                            <div class="updatestudentToAddSubs">
+        
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div class="individualStudentButtonContainer">
+                        <button type="submit">UPDATE</button>
+                    </div>
+                </div>
+            </form>
+        
+        </div>
+    </div>
+    <div class="confirmStudentRemoveModal">
+            <div class="modalBackground"></div>
+            <div class="confirmStudentRemoveBody">
+                <div class="upperStudentRemove">
+                    <p>REMOVE STUDENT</p>
+                    <p id="removeStudentExitButton">+</p>
+                </div>
+                <div class="lowerStudentRemove">
+                    <div class="studentRemoveText">
+                        <p>Are you sure you want to remove <span id="toBeRemovedStudent">ITIF 102</span>?</p>
+                    </div>
+                    <div class="studentRemoveButtonsContainer">
+                        <button id="studentRemoveButtonNo">No</button>
+                        <button id="studentRemoveButtonYes">Yes</button>
+        
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+
+    <div class="updateQuestionModal">
+        <div class="modalBackground"></div>
+        <div class="updateQuestionBody">
+            <div class="updateQuestionTopContainer">
+                <div class="updateQuestionexitButtonContainer">+</div>
+            </div>
+            <div class="updateQuestionBottomContainer">
+                <form action="/6682d59e13647863d2de9292/updateQuestion" method="POST" id="updateQuestionForm">
+                    <div class="updateQuestionCategoryContainer"><label>Question Category: </label><select
+                            name="updateQuestionCategory" id="updateQuestionCategory">
+                            <option value="course overview and orientation">COURSE OVERVIEW ORIENTATION</option>
+                            <option value="learning outcomes">LEARNING OUTCOMES</option>
+                            <option value="assessment">ASSESSMENT</option>
+                            <option value="instructional material/content">INSTRUCTIONAL MATERIAL/CONTENT</option>
+                            <option value="teacher presence and support">TEACHER PRESENCE AND SUPPORT</option>
+                            <option value="learning experiences and interaction">LEARNING EXPERIENCES AND INTERACTION
+                            </option>
+                            <option value="technology and accessibility">TECHNOLOGY AND ACCESSIBILITY</option>
+                        </select></div>
+                    <div class="updateQuestionTextContainer"><label>Question: </label><input name="questionText" id="updateQuestionTextInput"
+                            placeholder="Please type the question here." type="text">
+                        <div class="addQuestionButtonContainer"><button type="submit">Update</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 </body>
+
 <script src="/js/admin.js"></script>
+
+
 
 </html>
 

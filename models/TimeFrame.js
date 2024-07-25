@@ -35,6 +35,10 @@ const timeFrameSchema = new mongoose.Schema({
     type: String,
     enum:['1st', '2nd','3rd'],
     required: true
+  },
+  isActive:{
+    type: Boolean,
+    required: true
   }
 
 });

@@ -3,12 +3,20 @@ const innerRightContainer = document.querySelector('.innerRightContainer')
 const modalUpdate = document.querySelector('.modalUpdate')
 const body = document.querySelector('body')
 const adminId = getAdminIdFromUrl();
+const subjectBody = document.querySelector('.subjectBody')
+const subjectListContainer = document.querySelector('.subjectListContainer')
+const addIndividualSubjectModal = document.querySelector('.addIndividualSubjectModal')
+const addIndividualStudentModal = document.querySelector('.addIndividualStudentModal')
+
+
+
+
 
 for(let option of options){
     option.addEventListener('click', ()=> {
-        innerRightContainer.innerHTML ="" 
-
+        innerRightContainer.innerHTML = ''
         if(option.innerHTML === 'Instructors'){
+            subjectBody.style.display = 'none';
 
             const filterContainer = document.createElement('div')
 
@@ -61,7 +69,32 @@ for(let option of options){
             option6.innerHTML = "CCJE"
             filterContainerSelect.appendChild(option6)
 
+
+
+            const addBulkInstructorContainer = document.createElement('div')
+            addBulkInstructorContainer.classList.add('addBulkInstructorContainer')
+
+            const addBulkTeacherForm = document.createElement('form')
+            addBulkTeacherForm.action = `/${adminId}/addBulkTeacher`
+            addBulkTeacherForm.enctype = 'multipart/form-data'
+            addBulkTeacherForm.method = 'POST'
+
+
+            const addBulkTeacherInput = document.createElement('input')
+            addBulkTeacherInput.type = 'file'
+            addBulkTeacherInput.name = 'bulkTeacher'
+            addBulkTeacherInput.id = 'bulkTeacher'
+
+            const addBulkTeacherButton  = document.createElement('button')
+            addBulkTeacherButton.type = 'submit'
+            addBulkTeacherButton.innerText = 'Submit'
+
+            addBulkTeacherForm.appendChild(addBulkTeacherInput)
+            addBulkTeacherForm.appendChild(addBulkTeacherButton)
+            addBulkInstructorContainer.appendChild(addBulkTeacherForm)
+
             filterContainer.appendChild(filterContainerSelect)
+            filterContainer.appendChild(addBulkInstructorContainer)
 
 
             const instructorListContainer = document.createElement('div')
@@ -76,7 +109,7 @@ for(let option of options){
          filterContainerSelect.addEventListener('change', () => {
     if (filterContainerSelect.value === "CET") {
         instructorListContainer.innerHTML = ""
-        fetch('/cetDepartmentInstructors')
+        fetch(`/${adminId}/cetDepartmentInstructors`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -87,19 +120,21 @@ for(let option of options){
 
                 const { allTeachers } = data;
                 for (let teacher of allTeachers) {
+
+                console.log(allTeachers)
+
                 const eachTeacherContainer = document.createElement('div');
                 eachTeacherContainer.classList.add('eachTeacherContainer');
 
-                const teacherIconContainer = document.createElement('div');
-                teacherIconContainer.classList.add('teacherIconContainer');
-                const elementImgIconContainer = document.createElement('img');
-                elementImgIconContainer.src = `${teacher.imageURL}`;
-                teacherIconContainer.appendChild(elementImgIconContainer);
 
                 const teacherInfoContainer = document.createElement('div');
                 teacherInfoContainer.classList.add('teacherInfoContainer');
-
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
                 const spanFirstname = document.createElement('span');
+
                 spanFirstname.id = 'firstname';
                 spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
@@ -111,13 +146,8 @@ for(let option of options){
                 spanSubjects.id = 'subjects';
                 spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
 
-                teacherInfoContainer.appendChild(spanFirstname);
-                teacherInfoContainer.appendChild(spanLastname);
+                teacherInfoContainer.appendChild(spanName);
                 teacherInfoContainer.appendChild(spanSubjects);
-
-                eachTeacherContainer.appendChild(teacherIconContainer);
-                eachTeacherContainer.appendChild(teacherInfoContainer);
-
                     
                     
 
@@ -149,7 +179,7 @@ for(let option of options){
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -169,284 +199,217 @@ for(let option of options){
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                 for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
+                const updateIcon = document.querySelectorAll('.updateIcon');
 
-                        fetch(`/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response)=> {
-                            if(!response.ok){
-                                throw new Error('There is an error while fetching')
-                            }
-                            return response.json()
-                        }).then(data => {
-                    const foundTeacher = data.foundTeacher;
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
-                    const updateFormForm = document.createElement('form');
-                    updateFormForm.action = `/${foundTeacher._id}/updateForm?_method=PUT`;
-                    updateFormForm.method = 'POST';
-                    updateFormForm.enctype = 'multipart/form-data';
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
-                    const modalUpdate = document.createElement('div');
-                    modalUpdate.classList.add('modalUpdate');
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
-                    const modalBackground = document.createElement('div');
-                    modalBackground.classList.add('modalBackground');
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                    const modalUpdateForm = document.createElement('div');
-                    modalUpdateForm.classList.add('modalUpdateForm');
-                    updateFormForm.appendChild(modalUpdateForm);
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                    const modalUpdateFormP = document.createElement('p');
-                    modalUpdateFormP.innerHTML = `Update Information`;
-                    modalUpdateForm.appendChild(modalUpdateFormP);
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
 
-                    const updateInfoContainer = document.createElement('div');
-                    updateInfoContainer.classList.add('updateInfoContainer');
-                    modalUpdateForm.appendChild(updateInfoContainer);
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
 
-                    const pictureContainer = document.createElement('div');
-                    pictureContainer.classList.add('pictureContainer');
-                    updateInfoContainer.appendChild(pictureContainer);
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
 
-                    const picture = document.createElement('div');
-                    picture.classList.add('picture');
-                    pictureContainer.appendChild(picture);
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
 
-                    const innerPicture = document.createElement('div');
-                    innerPicture.classList.add('innerPicture');
-                    picture.appendChild(innerPicture);
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
 
-                    const innerPictureImg = document.createElement('img');
-                    innerPictureImg.src = foundTeacher.imageURL;
-                    innerPicture.appendChild(innerPictureImg);
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
 
-                    const inputPicture = document.createElement('div');
-                    inputPicture.classList.add('inputPicture');
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
 
-                    const inputPictureInput = document.createElement('input');
-                    inputPictureInput.type = 'file';
-                    inputPictureInput.name = 'image';
-                    inputPicture.appendChild(inputPictureInput);
-                    pictureContainer.appendChild(inputPicture);
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
 
-                    const inputsContainer = document.createElement('div');
-                    inputsContainer.classList.add('inputsContainer');
-                    updateInfoContainer.appendChild(inputsContainer);
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
+                }
+                department.appendChild(option);
+            });
 
-                    const Firstname = document.createElement('input');
-                    Firstname.type = 'text';
-                    Firstname.placeholder = 'Firstname';
-                    Firstname.name = 'firstname';
-                    Firstname.value = `${foundTeacher.firstname}`;
-                    inputsContainer.appendChild(Firstname);
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
 
-                    const Lastname = document.createElement('input');
-                    Lastname.type = 'text';
-                    Lastname.placeholder = 'Lastname';
-                    Lastname.name = 'lastname';
-                    Lastname.value = `${foundTeacher.lastname}`;
-                    inputsContainer.appendChild(Lastname);
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
 
-                    const department = document.createElement('select');
-                    department.name = 'department';
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
 
-                    const selectDepartment = document.createElement('option');
-                    selectDepartment.innerHTML = "SELECT DEPARTMENT";
-                    department.appendChild(selectDepartment);
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
 
-                    const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
-                    departments.forEach(dep => {
-                        const option = document.createElement('option');
-                        option.value = dep;
-                        option.innerHTML = dep;
-                        if (dep === foundTeacher.department) {
-                            option.selected = true;
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getTeacherSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
                         }
-                        department.appendChild(option);
-                    });
-
-                    const addSubjectsContainer = document.createElement('div');
-                    addSubjectsContainer.classList.add('addSubjectsContainer');
-
-                    const toBeAddedSubjects = document.createElement('div');
-                    toBeAddedSubjects.classList.add('toBeAddedSubjects');
-                    addSubjectsContainer.appendChild(toBeAddedSubjects);
-
-                    const addedSubjects = document.createElement('div');
-                    addedSubjects.classList.add('addedSubjects');
-                    addSubjectsContainer.appendChild(addedSubjects);
-
-                    inputsContainer.appendChild(department);
-                    inputsContainer.appendChild(addSubjectsContainer);
-
-                    // Fetch subjects details for the teacher
-                    fetch(`/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('There is an error while fetching subjects');
-                            }
-                            return response.json();
-                        })
-                        .then(subjects => {
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'subjectCodes';
-                            hiddenInput.value = '';
-                            updateFormForm.appendChild(hiddenInput);
-
-                            // Populate existing subjects in addedSubjects
-                            subjects.forEach(subject => {
-                                const eachSub = document.createElement('div');
-                                eachSub.classList.add('eachSub');
-                                eachSub.textContent = subject.code;
-
-                                const exitButton = document.createElement('div');
-                                exitButton.classList.add('exitButton');
-                                exitButton.textContent = '+';
-                                eachSub.appendChild(exitButton);
-
-                                addedSubjects.appendChild(eachSub);
-
-                                exitButton.addEventListener('click', () => {
-                                    eachSub.remove();
-                                    const eachToBeAddedSub = document.createElement('div');
-                                    eachToBeAddedSub.classList.add('eachToBeAddedSub');
-                                    eachToBeAddedSub.textContent = subject.code;
-
-                                    toBeAddedSubjects.appendChild(eachToBeAddedSub);
-
-                                    updateHiddenInput(hiddenInput, subject.code, 'remove');
-
-                                    eachToBeAddedSub.addEventListener('click', () => {
-                                        eachToBeAddedSub.remove();
-                                        const eachSub = document.createElement('div');
-                                        eachSub.classList.add('eachSub');
-                                        eachSub.textContent = subject.code;
-
-                                        const exitButton = document.createElement('div');
-                                        exitButton.classList.add('exitButton');
-                                        exitButton.textContent = '+';
-                                        eachSub.appendChild(exitButton);
-
-                                        addedSubjects.appendChild(eachSub);
-
-                                        updateHiddenInput(hiddenInput, subject.code, 'add');
-
-                                        exitButton.addEventListener('click', () => {
-                                            eachSub.remove();
-                                            toBeAddedSubjects.appendChild(eachToBeAddedSub);
-
-                                            updateHiddenInput(hiddenInput, subject.code, 'remove');
-                                        });
-                                    });
-                                });
-
-                                updateHiddenInput(hiddenInput, subject.code, 'add');
-                            });
-
-                            // Fetch available subjects in the CET department
-                            return fetch(`/getAvailableSubjects?department=CET`);
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('There is an error while fetching available subjects');
-                            }
-                            return response.json();
-                        })
-                        .then(available => {
-                            available.forEach(subject => {
-                                if (!foundTeacher.subjects.includes(subject._id)) {
-                                    const eachToBeAddedSub = document.createElement('div');
-                                    eachToBeAddedSub.classList.add('eachToBeAddedSub');
-                                    eachToBeAddedSub.textContent = subject.code;
-
-                                    toBeAddedSubjects.appendChild(eachToBeAddedSub);
-
-                                    eachToBeAddedSub.addEventListener('click', () => {
-                                        eachToBeAddedSub.remove();
-                                        const eachSub = document.createElement('div');
-                                        eachSub.classList.add('eachSub');
-                                        eachSub.textContent = subject.code;
-
-                                        const exitButton = document.createElement('div');
-                                        exitButton.classList.add('exitButton');
-                                        exitButton.textContent = '+';
-                                        eachSub.appendChild(exitButton);
-
-                                        addedSubjects.appendChild(eachSub);
-
-                                        updateHiddenInput(hiddenInput, subject.code, 'add');
-
-                                        exitButton.addEventListener('click', () => {
-                                            eachSub.remove();
-                                            toBeAddedSubjects.appendChild(eachToBeAddedSub);
-
-                                            updateHiddenInput(hiddenInput, subject.code, 'remove');
-                                        });
-                                    });
-                                }
-                            });
-                        })
-                        .catch(error => console.error('Error fetching subjects:', error));
-
-                    const updateButtonContainer = document.createElement('div');
-                    updateButtonContainer.classList.add('updateButtonContainer');
-                    modalUpdateForm.appendChild(updateButtonContainer);
-
-                    const updateButtonContainerButton = document.createElement('button');
-                    updateButtonContainerButton.innerHTML = "Save";
-                    updateButtonContainerButton.type = 'submit';
-                    updateButtonContainer.appendChild(updateButtonContainerButton);
-
-                    const exitBtnModalUpdate = document.createElement('div');
-                    exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
-                    exitBtnModalUpdate.innerHTML = '+';
-                    exitBtnModalUpdate.onclick = () => {
-                        modalUpdate.classList.add('modalHidden');
-                    };
-
-                    modalUpdateForm.appendChild(exitBtnModalUpdate);
-
-                    modalUpdate.appendChild(modalBackground);
-                    modalUpdate.appendChild(updateFormForm);
-                    document.body.appendChild(modalUpdate);
-
-                    // Collecting updated subjects upon form submission
-                    updateFormForm.addEventListener('submit', (e) => {
-                        e.preventDefault();
-
-                        const updatedSubjects = [];
-                        addedSubjects.querySelectorAll('.eachSub').forEach(item => {
-                            const subjectCode = item.textContent.trim().split(' ')[0];
-                            updatedSubjects.push(subjectCode);
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
                         });
 
-                        // Add the updated subjects to the form data
-                        const formData = new FormData(updateFormForm);
-                        formData.append('subjects', JSON.stringify(updatedSubjects));
-
-                        // Send the form data using fetch
-                        fetch(updateFormForm.action, {
-                            method: 'POST',
-                            body: formData
-                        }).then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to update the instructor');
-                            }
-                            return response.json();
-                        }).then(result => {
-                            console.log('Instructor updated successfully:', result);
-                            modalUpdate.classList.add('modalHidden');
-                        }).catch(error => console.error('Error updating instructor:', error));
-                    });
-                }).catch((e)=> {
-                            console.log(e)
-                        })
-                        
-                        
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
                     })
-                }
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
 
 
 
@@ -513,8 +476,8 @@ for(let option of options){
 
                         modalRemoveButtonsContainerYes.addEventListener('click', () => {
     const teacherFullName = icon.id; // Assuming the id contains the full name
-
-    fetch('/removeInstructor', {
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -561,40 +524,14 @@ for(let option of options){
                         modalAddTeacherForm.classList.add('modalAddTeacherForm')
 
                         const modalAddTeacherFormP = document.createElement('p')
-                        modalAddTeacherFormP.innerHTML = `Update Information`
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
                         modalAddTeacherForm.appendChild(modalAddTeacherFormP)
 
                         const addTeacherInfoContainer = document.createElement('div')
                         addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
                         modalAddTeacherForm.appendChild(addTeacherInfoContainer)
 
-                        const pictureContainer = document.createElement('div')
-                        pictureContainer.classList.add('pictureContainer')
-                        addTeacherInfoContainer.appendChild(pictureContainer)
-
-                        const picture = document.createElement('div')
-                        picture.classList.add('picture')
-                        pictureContainer.appendChild(picture)
-
-                        const innerPicture = document.createElement('div')
-                        innerPicture.classList.add('innerPicture')
-                        picture.appendChild(innerPicture)
-
-
                        
-                        const innerPictureImg = document.createElement('img')
-                        innerPictureImg.src = '/images/userLogo.png'
-                        innerPicture.appendChild(innerPictureImg)
-
-                        const inputPicture = document.createElement('div')
-                        inputPicture.classList.add('inputPicture')
-
-                        const inputPictureInput = document.createElement('input')
-                        inputPictureInput.type = 'file'
-                        inputPictureInput.name ="image"
-
-                        inputPicture.appendChild(inputPictureInput)
-                        pictureContainer.appendChild(inputPicture)
                         
                         const inputsContainer = document.createElement('div')
                         inputsContainer.classList.add('inputsContainer')
@@ -604,16 +541,19 @@ for(let option of options){
                         Firstname.type = 'text'
                         Firstname.placeholder = 'Firstname'
                         Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
                         inputsContainer.appendChild(Firstname)
 
                         const Lastname = document.createElement('input')
                         Lastname.type = 'text'
                         Lastname.placeholder = 'Lastname'
                         Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
                         inputsContainer.appendChild(Lastname)
                         
                         const department = document.createElement('select')
                         department.name = 'department'
+                        department.id = 'addFormDepartment'
                         department.classList.add('department')
                         const selectDepartment = document.createElement('option')
 
@@ -680,7 +620,7 @@ for(let option of options){
                         exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
                         exitBtnModalAddTeacher.innerHTML = '+'
                         exitBtnModalAddTeacher.onclick = () => {
-                            modalAddTeacher.classList.add('modalHidden')
+                            modalAddTeacher.remove()
                         }
                        
                         modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
@@ -696,72 +636,109 @@ for(let option of options){
                         modalAddTeacher.appendChild(formAdd)
                     
 
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
 
-                       const departmentElement = document.querySelector('.department')
-                       departmentElement.addEventListener('change', ()=> {
-                        if(departmentElement.value === 'CET'){
-                           const queryString = `/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
-                            fetch(queryString).then((response)=> {
-                                if(!response.ok){
-                                    throw new Error('the fetch network is not okay.')
-                                }
-                                return response.json()
-                            }).then((data) => {
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
 
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
 
-                                
-                            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
-                            const addedSubjects = document.querySelector('.addedSubjects');
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'subjectCodes';
-                            hiddenInput.value = '';
-                            formAdd.appendChild(hiddenInput)
-                            const subjects = data.allSubs;
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
 
-                            subjects.forEach((subject) => {
-                            const eachToBeAddedSub = document.createElement('div');
-                            eachToBeAddedSub.classList.add('eachToBeAddedSub');
-                            eachToBeAddedSub.textContent = subject.code;
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
 
-                            toBeAddedSubjects.appendChild(eachToBeAddedSub);
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
 
-                            eachToBeAddedSub.addEventListener('click', () => {
-                            const eachSub = document.createElement('div');
-                            eachSub.classList.add('eachSub');
-                            eachSub.textContent = subject.code;
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
 
-                            const exitButton = document.createElement('div');
-                            exitButton.classList.add('exitButton');
-                            exitButton.textContent = '+';
-                            eachSub.appendChild(exitButton);
-
-                            addedSubjects.appendChild(eachSub);
-                            eachToBeAddedSub.remove(); 
-
-                            updateHiddenInput(hiddenInput, subject.code, 'add');
-
-                            exitButton.addEventListener('click', () => {
-                                eachSub.remove();
-                                toBeAddedSubjects.appendChild(eachToBeAddedSub);
-
-                                updateHiddenInput(hiddenInput, subject.code, 'remove');
-                            });
-                        });
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
                     });
-                })
-                                }
-                            })
-                        })
-                    })
-
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
+                });
             });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        formAdd.reset()
+        modalAddTeacher.remove()
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
+            }).catch((e)=>{
+                 console.log(e.message)
+            })
+
+           
     } else if (filterContainerSelect.value === "CBA") {
         instructorListContainer.innerHTML = ""
 
-        fetch('/cbaDepartmentInstructors')
+        fetch(`/${adminId}/cbaDepartmentInstructors`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -770,39 +747,33 @@ for(let option of options){
             })
             .then(data => {
 
-                const {allTeachers} = data
-                for(let teacher of allTeachers){
-                    const eachTeacherContainer = document.createElement('div')
-                    eachTeacherContainer.classList.add('eachTeacherContainer')
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
 
 
-                    const teacherIconContainer = document.createElement('div')
-                    teacherIconContainer.classList.add('teacherIconContainer')
-                    const elementImgIconContainer = document.createElement('img')
-                    elementImgIconContainer.src = `${teacher.imageURL}`
-                    teacherIconContainer.appendChild(elementImgIconContainer)
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
 
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
-                    const teacherInfoContainer = document.createElement('div')
-                    teacherInfoContainer.classList.add('teacherInfoContainer')
-                    const spanFirstname = document.createElement('span')
-                    spanFirstname.id = 'firstname'
-                    spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`
-                    const spanLastname = document.createElement('span')
-                    spanLastname.id = 'lastname'
-                    spanLastname.innerHTML = `Lastname: ${teacher.lastname}`
-                    const spanAge = document.createElement('span')
-                    spanAge.id = 'age'
-                    spanAge.innerHTML = `Age: ${teacher.age}`
-                    const spanAddress = document.createElement('span')
-                    spanAddress.id = 'address'
-                    spanAddress.innerHTML = `Address: ${teacher.address}`
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
 
-                    teacherInfoContainer.appendChild(spanFirstname)
-                    teacherInfoContainer.appendChild(spanLastname)
-                    teacherInfoContainer.appendChild(spanAge)
-                    teacherInfoContainer.appendChild(spanAddress)
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
 
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
                     
                     
 
@@ -834,7 +805,7 @@ for(let option of options){
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -844,48 +815,230 @@ for(let option of options){
                 }
                  const addTeacherContainer = document.createElement('div')
                     addTeacherContainer.classList.add('addTeacherContainer')
-                    addTeacherContainer.innerHTML = '+'
                     instructorListContainer.appendChild(addTeacherContainer)
 
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
 
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
-                        const modalUpdate = document.createElement('div')
-                        modalUpdate.classList.add('modalUpdate')
-                        modalUpdate.classList.add('modalHidden')
 
-                        const modalBackground = document.createElement('div')
-                        modalBackground.classList.add('modalBackground')
+const updateIcon = document.querySelectorAll('.updateIcon');
 
-                        const modalUpdateForm = document.createElement('div')
-                        modalUpdateForm.classList.add('modalUpdateForm')
-                    
-                        const modalUpdateFormP = document.createElement('p')
-                        modalUpdateFormP.innerHTML = `Update Information for ${icon.id}`
-                        modalUpdateForm.appendChild(modalUpdateFormP)
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
-                        const exitBtnModalUpdate = document.createElement('div')
-                        exitBtnModalUpdate.classList.add('exitBtnModalUpdate')
-                        exitBtnModalUpdate.innerHTML = '+'
-                        exitBtnModalUpdate.onclick = () => {
-                            modalUpdate.classList.add('modalHidden')
-                        }
-                        modalUpdateForm.appendChild(exitBtnModalUpdate)
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                        modalUpdate.appendChild(modalBackground)
-                        modalUpdate.appendChild(modalUpdateForm)
-                        modalUpdate.classList.remove('modalHidden')
-                        body.appendChild(modalUpdate)
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                    })
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
                 }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
+
+
 
 
 
@@ -947,8 +1100,263 @@ for(let option of options){
                         
                         modalRemove.classList.remove('modalHidden')
                         body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; // Assuming the id contains the full name
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) // Sending the full name in the request body
+    })
+    .then(response => {
+        if (response.ok) {
+            // Successfully deleted
+            // You can update your UI accordingly
+        } else {
+            // Handle error
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
                     })
                 }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
             })
 
             .catch(error => {
@@ -957,7 +1365,7 @@ for(let option of options){
     }else if(filterContainerSelect.value === "CEAA"){
         instructorListContainer.innerHTML = ""
 
-fetch('/ceaaDepartmentInstructors')
+fetch(`/${adminId}/ceaaDepartmentInstructors`)
 
             .then(response => {
                 if (!response.ok) {
@@ -965,41 +1373,35 @@ fetch('/ceaaDepartmentInstructors')
                 }
                 return response.json(); 
             })
-            .then(data => {
+           .then(data => {
 
-                const {allTeachers} = data
-                for(let teacher of allTeachers){
-                    const eachTeacherContainer = document.createElement('div')
-                    eachTeacherContainer.classList.add('eachTeacherContainer')
-
-
-                    const teacherIconContainer = document.createElement('div')
-                    teacherIconContainer.classList.add('teacherIconContainer')
-                    const elementImgIconContainer = document.createElement('img')
-                    elementImgIconContainer.src = `${teacher.imageURL}`
-                    teacherIconContainer.appendChild(elementImgIconContainer)
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
 
 
-                    const teacherInfoContainer = document.createElement('div')
-                    teacherInfoContainer.classList.add('teacherInfoContainer')
-                    const spanFirstname = document.createElement('span')
-                    spanFirstname.id = 'firstname'
-                    spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`
-                    const spanLastname = document.createElement('span')
-                    spanLastname.id = 'lastname'
-                    spanLastname.innerHTML = `Lastname: ${teacher.lastname}`
-                    const spanAge = document.createElement('span')
-                    spanAge.id = 'age'
-                    spanAge.innerHTML = `Age: ${teacher.age}`
-                    const spanAddress = document.createElement('span')
-                    spanAddress.id = 'address'
-                    spanAddress.innerHTML = `Address: ${teacher.address}`
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
 
-                    teacherInfoContainer.appendChild(spanFirstname)
-                    teacherInfoContainer.appendChild(spanLastname)
-                    teacherInfoContainer.appendChild(spanAge)
-                    teacherInfoContainer.appendChild(spanAddress)
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
+
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
+
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
                     
                     
 
@@ -1009,7 +1411,7 @@ fetch('/ceaaDepartmentInstructors')
                     updateIcon.classList.add('updateIcon')
                     const elementUpdateIconImg = document.createElement('img')
                     elementUpdateIconImg.src = '/images/updateIcon.svg'
-                    updateIcon.id = `${teacher.firstname}`
+                    updateIcon.id = `${teacher.fullname}`
                     updateIcon.appendChild(elementUpdateIconImg)
 
 
@@ -1020,7 +1422,7 @@ fetch('/ceaaDepartmentInstructors')
                     const elementRemoveIconImg = document.createElement('img')
                     elementRemoveIconImg.src = '/images/removeIcon.svg'
                     removeIcon.appendChild(elementRemoveIconImg)
-                    removeIcon.id = `${teacher.firstname}`
+                    removeIcon.id = `${teacher.fullname}`
 
 
 
@@ -1031,7 +1433,7 @@ fetch('/ceaaDepartmentInstructors')
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -1041,140 +1443,228 @@ fetch('/ceaaDepartmentInstructors')
                 }
                  const addTeacherContainer = document.createElement('div')
                     addTeacherContainer.classList.add('addTeacherContainer')
-                    addTeacherContainer.innerHTML = '+'      
                     instructorListContainer.appendChild(addTeacherContainer)
 
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
 
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
 
-                        fetch(`/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response)=> {
-                            if(!response.ok){
-                                throw new Error('There is an error while fetching')
-                            }
-                            return response.json()
-                        }).then((data)=> {
-                            const modalUpdate = document.createElement('div')
-                        modalUpdate.classList.add('modalUpdate')
+                const updateIcon = document.querySelectorAll('.updateIcon');
 
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
-                        const modalBackground = document.createElement('div')
-                        modalBackground.classList.add('modalBackground')
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
-                        const modalUpdateForm = document.createElement('div')
-                        modalUpdateForm.classList.add('modalUpdateForm')
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                        const modalUpdateFormP = document.createElement('p')
-                        modalUpdateFormP.innerHTML = `Update Information`
-                        modalUpdateForm.appendChild(modalUpdateFormP)
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                        const updateInfoContainer = document.createElement('div')
-                        updateInfoContainer.classList.add('updateInfoContainer')
-                        modalUpdateForm.appendChild(updateInfoContainer)
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
 
-                        const pictureContainer = document.createElement('div')
-                        pictureContainer.classList.add('pictureContainer')
-                        updateInfoContainer.appendChild(pictureContainer)
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
 
-                        const picture = document.createElement('div')
-                        picture.classList.add('picture')
-                        pictureContainer.appendChild(picture)
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
 
-                        const innerPicture = document.createElement('div')
-                        innerPicture.classList.add('innerPicture')
-                        picture.appendChild(innerPicture)
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
 
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
 
-                       
-                        const innerPictureImg = document.createElement('img')
-                        innerPicture.appendChild(innerPictureImg)
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
 
-                        const inputPicture = document.createElement('div')
-                        inputPicture.classList.add('inputPicture')
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
 
-                        const inputPictureInput = document.createElement('input')
-                        inputPictureInput.type = 'file'
-                        inputPicture.appendChild(inputPictureInput)
-                        
-                        const inputsContainer = document.createElement('div')
-                        inputsContainer.classList.add('inputsContainer')
-                        updateInfoContainer.appendChild(inputsContainer)
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
 
-                        const Firstname = document.createElement('input')
-                        Firstname.type = 'text'
-                        Firstname.placeholder = 'Firstname'
-                        Firstname.name = 'firstname'
-                        Firstname.value = `${data.foundTeacher.firstname}`
-                        inputsContainer.appendChild(Firstname)
-
-                        const Lastname = document.createElement('input')
-                        Lastname.type = 'text'
-                        Lastname.placeholder = 'Lastname'
-                        Lastname.name = 'lastname'
-                        Lastname.value = `${data.foundTeacher.lastname}`
-                        inputsContainer.appendChild(Lastname)
-                        
-                        const Age = document.createElement('input')
-                        Age.type = 'text'
-                        Age.placeholder = 'Age'
-                        Age.name = 'age'
-                        Age.value = `${data.foundTeacher.age}`
-                        inputsContainer.appendChild(Age)
-
-                        const Address = document.createElement('input')
-                        Address.type = 'text'
-                        Address.placeholder = 'Address'
-                        Address.name = 'address'
-                        Address.value = `${data.foundTeacher.address}`
-                        inputsContainer.appendChild(Address)
-
-                        const department = document.createElement('select')
-
-                        const selectDepartment = document.createElement('option')
-                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
-                        department.appendChild(selectDepartment)
-
-                        const CET = document.createElement('option')
-                        CET.value = "CET"
-                        CET.innerHTML = "CET"
-                        department.appendChild(CET)
-                        
-                        const updateButtonContainer = document.createElement('div')
-                        updateButtonContainer.classList.add('updateButtonContainer')
-                        modalUpdateForm.appendChild(updateButtonContainer)
-
-                        const updateButtonContainerButton = document.createElement('button')
-                        updateButtonContainerButton.innerHTML = "Save"
-                        updateButtonContainer.appendChild(updateButtonContainerButton)
-
-                        const exitBtnModalUpdate = document.createElement('div')
-                        exitBtnModalUpdate.classList.add('exitBtnModalUpdate')
-                        exitBtnModalUpdate.innerHTML = '+'
-                        exitBtnModalUpdate.onclick = () => {
-                            modalUpdate.classList.add('modalHidden')
-                        }
-
-                        modalUpdateForm.appendChild(exitBtnModalUpdate)
-
-
-                        modalUpdate.appendChild(modalBackground)
-                        modalUpdate.appendChild(modalUpdateForm)
-                        body.appendChild(modalUpdate)
-
-
-                        }).catch((e)=> {
-                            console.log(e)
-                        })
-                        
-                        
-                    })
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
                 }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
 
 
 
@@ -1236,8 +1726,263 @@ fetch('/ceaaDepartmentInstructors')
                         
                         modalRemove.classList.remove('modalHidden')
                         body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; // Assuming the id contains the full name
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) // Sending the full name in the request body
+    })
+    .then(response => {
+        if (response.ok) {
+            // Successfully deleted
+            // You can update your UI accordingly
+        } else {
+            // Handle error
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
                     })
                 }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
             })
 
             .catch(error => {
@@ -1246,7 +1991,7 @@ fetch('/ceaaDepartmentInstructors')
     }else if(filterContainerSelect.value === "CHM"){
         instructorListContainer.innerHTML = ""
 
-fetch('/chmDepartmentInstructors')
+fetch(`/${adminId}/chmDepartmentInstructors`)
 
             .then(response => {
                 if (!response.ok) {
@@ -1254,41 +1999,35 @@ fetch('/chmDepartmentInstructors')
                 }
                 return response.json(); 
             })
-            .then(data => {
+           .then(data => {
 
-                const {allTeachers} = data
-                for(let teacher of allTeachers){
-                    const eachTeacherContainer = document.createElement('div')
-                    eachTeacherContainer.classList.add('eachTeacherContainer')
-
-
-                    const teacherIconContainer = document.createElement('div')
-                    teacherIconContainer.classList.add('teacherIconContainer')
-                    const elementImgIconContainer = document.createElement('img')
-                    elementImgIconContainer.src = `${teacher.imageURL}`
-                    teacherIconContainer.appendChild(elementImgIconContainer)
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
 
 
-                    const teacherInfoContainer = document.createElement('div')
-                    teacherInfoContainer.classList.add('teacherInfoContainer')
-                    const spanFirstname = document.createElement('span')
-                    spanFirstname.id = 'firstname'
-                    spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`
-                    const spanLastname = document.createElement('span')
-                    spanLastname.id = 'lastname'
-                    spanLastname.innerHTML = `Lastname: ${teacher.lastname}`
-                    const spanAge = document.createElement('span')
-                    spanAge.id = 'age'
-                    spanAge.innerHTML = `Age: ${teacher.age}`
-                    const spanAddress = document.createElement('span')
-                    spanAddress.id = 'address'
-                    spanAddress.innerHTML = `Address: ${teacher.address}`
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
 
-                    teacherInfoContainer.appendChild(spanFirstname)
-                    teacherInfoContainer.appendChild(spanLastname)
-                    teacherInfoContainer.appendChild(spanAge)
-                    teacherInfoContainer.appendChild(spanAddress)
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
+
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
+
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
                     
                     
 
@@ -1320,7 +2059,7 @@ fetch('/chmDepartmentInstructors')
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -1330,48 +2069,227 @@ fetch('/chmDepartmentInstructors')
                 }
                  const addTeacherContainer = document.createElement('div')
                     addTeacherContainer.classList.add('addTeacherContainer')
-                    addTeacherContainer.innerHTML = '+'
                     instructorListContainer.appendChild(addTeacherContainer)
 
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
 
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
-                        const modalUpdate = document.createElement('div')
-                        modalUpdate.classList.add('modalUpdate')
-                        modalUpdate.classList.add('modalHidden')
 
-                        const modalBackground = document.createElement('div')
-                        modalBackground.classList.add('modalBackground')
+                const updateIcon = document.querySelectorAll('.updateIcon');
 
-                        const modalUpdateForm = document.createElement('div')
-                        modalUpdateForm.classList.add('modalUpdateForm')
-                    
-                        const modalUpdateFormP = document.createElement('p')
-                        modalUpdateFormP.innerHTML = `Update Information for ${icon.id}`
-                        modalUpdateForm.appendChild(modalUpdateFormP)
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
-                        const exitBtnModalUpdate = document.createElement('div')
-                        exitBtnModalUpdate.classList.add('exitBtnModalUpdate')
-                        exitBtnModalUpdate.innerHTML = '+'
-                        exitBtnModalUpdate.onclick = () => {
-                            modalUpdate.classList.add('modalHidden')
-                        }
-                        modalUpdateForm.appendChild(exitBtnModalUpdate)
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                        modalUpdate.appendChild(modalBackground)
-                        modalUpdate.appendChild(modalUpdateForm)
-                        modalUpdate.classList.remove('modalHidden')
-                        body.appendChild(modalUpdate)
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                    })
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
                 }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
 
 
 
@@ -1433,18 +2351,272 @@ fetch('/chmDepartmentInstructors')
                         
                         modalRemove.classList.remove('modalHidden')
                         body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; // Assuming the id contains the full name
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) // Sending the full name in the request body
+    })
+    .then(response => {
+        if (response.ok) {
+            // Successfully deleted
+            // You can update your UI accordingly
+        } else {
+            // Handle error
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
                     })
                 }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
             })
 
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
     }else if(filterContainerSelect.value === "CNHS"){
+
         instructorListContainer.innerHTML = ""
-
-        fetch('/cnhsDepartmentInstructors')
-
+        fetch(`/${adminId}/cnhsDepartmentInstructors`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -1453,39 +2625,36 @@ fetch('/chmDepartmentInstructors')
             })
             .then(data => {
 
-                const {allTeachers} = data
-                for(let teacher of allTeachers){
-                    const eachTeacherContainer = document.createElement('div')
-                    eachTeacherContainer.classList.add('eachTeacherContainer')
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
+
+                console.log(allTeachers)
+
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
 
 
-                    const teacherIconContainer = document.createElement('div')
-                    teacherIconContainer.classList.add('teacherIconContainer')
-                    const elementImgIconContainer = document.createElement('img')
-                    elementImgIconContainer.src = `${teacher.imageURL}`
-                    teacherIconContainer.appendChild(elementImgIconContainer)
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
 
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
-                    const teacherInfoContainer = document.createElement('div')
-                    teacherInfoContainer.classList.add('teacherInfoContainer')
-                    const spanFirstname = document.createElement('span')
-                    spanFirstname.id = 'firstname'
-                    spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`
-                    const spanLastname = document.createElement('span')
-                    spanLastname.id = 'lastname'
-                    spanLastname.innerHTML = `Lastname: ${teacher.lastname}`
-                    const spanAge = document.createElement('span')
-                    spanAge.id = 'age'
-                    spanAge.innerHTML = `Age: ${teacher.age}`
-                    const spanAddress = document.createElement('span')
-                    spanAddress.id = 'address'
-                    spanAddress.innerHTML = `Address: ${teacher.address}`
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
 
-                    teacherInfoContainer.appendChild(spanFirstname)
-                    teacherInfoContainer.appendChild(spanLastname)
-                    teacherInfoContainer.appendChild(spanAge)
-                    teacherInfoContainer.appendChild(spanAddress)
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
 
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
                     
                     
 
@@ -1517,7 +2686,7 @@ fetch('/chmDepartmentInstructors')
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -1527,48 +2696,227 @@ fetch('/chmDepartmentInstructors')
                 }
                  const addTeacherContainer = document.createElement('div')
                     addTeacherContainer.classList.add('addTeacherContainer')
-                    addTeacherContainer.innerHTML = '+'
                     instructorListContainer.appendChild(addTeacherContainer)
 
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
 
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
-                        const modalUpdate = document.createElement('div')
-                        modalUpdate.classList.add('modalUpdate')
-                        modalUpdate.classList.add('modalHidden')
 
-                        const modalBackground = document.createElement('div')
-                        modalBackground.classList.add('modalBackground')
+                const updateIcon = document.querySelectorAll('.updateIcon');
 
-                        const modalUpdateForm = document.createElement('div')
-                        modalUpdateForm.classList.add('modalUpdateForm')
-                    
-                        const modalUpdateFormP = document.createElement('p')
-                        modalUpdateFormP.innerHTML = `Update Information for ${icon.id}`
-                        modalUpdateForm.appendChild(modalUpdateFormP)
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
-                        const exitBtnModalUpdate = document.createElement('div')
-                        exitBtnModalUpdate.classList.add('exitBtnModalUpdate')
-                        exitBtnModalUpdate.innerHTML = '+'
-                        exitBtnModalUpdate.onclick = () => {
-                            modalUpdate.classList.add('modalHidden')
-                        }
-                        modalUpdateForm.appendChild(exitBtnModalUpdate)
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                        modalUpdate.appendChild(modalBackground)
-                        modalUpdate.appendChild(modalUpdateForm)
-                        modalUpdate.classList.remove('modalHidden')
-                        body.appendChild(modalUpdate)
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                    })
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
                 }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getTeacherSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
 
 
 
@@ -1630,18 +2978,887 @@ fetch('/chmDepartmentInstructors')
                         
                         modalRemove.classList.remove('modalHidden')
                         body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; // Assuming the id contains the full name
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) // Sending the full name in the request body
+    })
+    .then(response => {
+        if (response.ok) {
+            // Successfully deleted
+            // You can update your UI accordingly
+        } else {
+            // Handle error
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
                     })
                 }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        formAdd.reset()
+        modalAddTeacher.remove()
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
+            }).catch((e)=>{
+                 console.log(e.message)
+            })
+        i/* nstructorListContainer.innerHTML = ""
+
+        fetch(`/${adminId}/cnhsDepartmentInstructors`)
+
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); 
+            })
+           .then(data => {
+
+                const { allTeachers } = data;
+                console.log(allTeachers)
+                for (let teacher of allTeachers) {
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
+
+
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
+
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
+
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
+
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
+
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
+                    
+                    
+
+                    const teacherOptionsContainer = document.createElement('div')
+                    teacherOptionsContainer.classList.add('teacherOptionsContainer')
+                    const updateIcon = document.createElement('div')
+                    updateIcon.classList.add('updateIcon')
+                    const elementUpdateIconImg = document.createElement('img')
+                    elementUpdateIconImg.src = '/images/updateIcon.svg'
+                    updateIcon.id = `${teacher.fullname}`
+                    updateIcon.appendChild(elementUpdateIconImg)
+
+
+
+
+                    const removeIcon = document.createElement('div')
+                    removeIcon.classList.add('removeIcon')
+                    const elementRemoveIconImg = document.createElement('img')
+                    elementRemoveIconImg.src = '/images/removeIcon.svg'
+                    removeIcon.appendChild(elementRemoveIconImg)
+                    removeIcon.id = `${teacher.fullname}`
+
+
+
+                    teacherOptionsContainer.appendChild(updateIcon)
+                    teacherOptionsContainer.appendChild(removeIcon)
+
+
+                   
+
+
+                    eachTeacherContainer.appendChild(teacherInfoContainer)
+                    eachTeacherContainer.appendChild(teacherOptionsContainer)
+                    
+                    instructorListContainer.appendChild(eachTeacherContainer)
+
+
+                }
+                 const addTeacherContainer = document.createElement('div')
+                    addTeacherContainer.classList.add('addTeacherContainer')
+                    instructorListContainer.appendChild(addTeacherContainer)
+
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
+
+
+
+
+
+                const updateIcon = document.querySelectorAll('.updateIcon');
+
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
+
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
+
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
+
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
+
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
+
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
+                }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; 
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; 
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+         
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
+
+
+                const removeIcon = document.querySelectorAll('.removeIcon')
+
+                for(let icon of removeIcon){
+                    icon.addEventListener('click', ()=> {
+                        const modalRemove = document.createElement('div')
+                        modalRemove.classList.add('modalRemove')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+                        modalRemove.appendChild(modalBackground)
+
+
+                        const modalRemoveForm = document.createElement('div')
+                        modalRemoveForm.classList.add('modalRemoveForm')
+                        modalRemove.appendChild(modalRemoveForm)
+
+
+                        const modalRemoveTextsContainer = document.createElement('div')
+                        modalRemoveTextsContainer.classList.add('modalRemoveTextsContainer')
+                        const modalRemoveTextsContainerP = document.createElement('p')
+                        modalRemoveTextsContainerP.innerHTML = `Are you sure you are going to remove ${icon.id}`
+                        modalRemoveTextsContainer.appendChild(modalRemoveTextsContainerP)
+                        modalRemoveForm.appendChild(modalRemoveTextsContainer)
+
+
+                        const modalRemoveButtonsContainer = document.createElement('div')
+                        modalRemoveButtonsContainer.classList.add('modalRemoveButtonsContainer')
+                        modalRemoveForm.appendChild(modalRemoveButtonsContainer)
+                        const modalRemoveButtonsContainerNo = document.createElement('button')
+                        modalRemoveButtonsContainerNo.innerHTML = 'No'
+                        modalRemoveButtonsContainerNo.id = "confirmNo"
+
+                        const modalRemoveButtonsContainerYes = document.createElement('button')
+                        modalRemoveButtonsContainerYes.innerHTML = 'Yes'
+                        modalRemoveButtonsContainerYes.id = "confirmYes"
+
+
+                        modalRemoveButtonsContainer.appendChild(modalRemoveButtonsContainerNo)
+                        modalRemoveButtonsContainer.appendChild(modalRemoveButtonsContainerYes)
+                        
+
+                        const exitBtnModalRemove = document.createElement('div')
+                        exitBtnModalRemove.classList.add('exitBtnModalRemove')
+                        exitBtnModalRemove.innerHTML = '+'
+                        modalRemoveForm.appendChild(exitBtnModalRemove)
+                        exitBtnModalRemove.onclick = () => {
+                            modalRemove.classList.add('modalHidden')
+                        }
+                
+
+                        modalRemoveButtonsContainerNo.onclick = () => {
+                            modalRemove.classList.add('modalHidden')
+                        }
+                     
+                        
+                        modalRemove.classList.remove('modalHidden')
+                        body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; 
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) 
+    })
+    .then(response => {
+        if (response.ok) {
+          
+        } else {
+          
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
+                    })
+                }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
             })
 
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
-            });
+            }); */
     }else if(filterContainerSelect.value === "CCJE"){
+
         instructorListContainer.innerHTML = ""
-
-        fetch('/ccjeDepartmentInstructors')
-
+        fetch(`/${adminId}/ccjeDepartmentInstructors`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -1650,39 +3867,35 @@ fetch('/chmDepartmentInstructors')
             })
             .then(data => {
 
-                const {allTeachers} = data
-                for(let teacher of allTeachers){
-                    const eachTeacherContainer = document.createElement('div')
-                    eachTeacherContainer.classList.add('eachTeacherContainer')
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
 
 
-                    const teacherIconContainer = document.createElement('div')
-                    teacherIconContainer.classList.add('teacherIconContainer')
-                    const elementImgIconContainer = document.createElement('img')
-                    elementImgIconContainer.src = `${teacher.imageURL}`
-                    teacherIconContainer.appendChild(elementImgIconContainer)
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
 
 
-                    const teacherInfoContainer = document.createElement('div')
-                    teacherInfoContainer.classList.add('teacherInfoContainer')
-                    const spanFirstname = document.createElement('span')
-                    spanFirstname.id = 'firstname'
-                    spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`
-                    const spanLastname = document.createElement('span')
-                    spanLastname.id = 'lastname'
-                    spanLastname.innerHTML = `Lastname: ${teacher.lastname}`
-                    const spanAge = document.createElement('span')
-                    spanAge.id = 'age'
-                    spanAge.innerHTML = `Age: ${teacher.age}`
-                    const spanAddress = document.createElement('span')
-                    spanAddress.id = 'address'
-                    spanAddress.innerHTML = `Address: ${teacher.address}`
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
 
-                    teacherInfoContainer.appendChild(spanFirstname)
-                    teacherInfoContainer.appendChild(spanLastname)
-                    teacherInfoContainer.appendChild(spanAge)
-                    teacherInfoContainer.appendChild(spanAddress)
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
 
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
+
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
+
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
                     
                     
 
@@ -1714,7 +3927,7 @@ fetch('/chmDepartmentInstructors')
                    
 
 
-                    eachTeacherContainer.appendChild(teacherIconContainer)
+                    /* eachTeacherContainer.appendChild(teacherIconContainer) */
                     eachTeacherContainer.appendChild(teacherInfoContainer)
                     eachTeacherContainer.appendChild(teacherOptionsContainer)
                     
@@ -1724,48 +3937,225 @@ fetch('/chmDepartmentInstructors')
                 }
                  const addTeacherContainer = document.createElement('div')
                     addTeacherContainer.classList.add('addTeacherContainer')
-                    addTeacherContainer.innerHTML = '+'
                     instructorListContainer.appendChild(addTeacherContainer)
 
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
 
 
 
 
-                const updateIcon = document.querySelectorAll('.updateIcon')
-                
-                for(let icon of updateIcon){
-                    icon.addEventListener('click', ()=> {
-                        const modalUpdate = document.createElement('div')
-                        modalUpdate.classList.add('modalUpdate')
-                        modalUpdate.classList.add('modalHidden')
 
-                        const modalBackground = document.createElement('div')
-                        modalBackground.classList.add('modalBackground')
+                const updateIcon = document.querySelectorAll('.updateIcon');
 
-                        const modalUpdateForm = document.createElement('div')
-                        modalUpdateForm.classList.add('modalUpdateForm')
-                    
-                        const modalUpdateFormP = document.createElement('p')
-                        modalUpdateFormP.innerHTML = `Update Information for ${icon.id}`
-                        modalUpdateForm.appendChild(modalUpdateFormP)
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
 
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
 
-                        const exitBtnModalUpdate = document.createElement('div')
-                        exitBtnModalUpdate.classList.add('exitBtnModalUpdate')
-                        exitBtnModalUpdate.innerHTML = '+'
-                        exitBtnModalUpdate.onclick = () => {
-                            modalUpdate.classList.add('modalHidden')
-                        }
-                        modalUpdateForm.appendChild(exitBtnModalUpdate)
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
 
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
 
-                        modalUpdate.appendChild(modalBackground)
-                        modalUpdate.appendChild(modalUpdateForm)
-                        modalUpdate.classList.remove('modalHidden')
-                        body.appendChild(modalUpdate)
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
 
-                    })
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
                 }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            // Fetch and display subjects
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getTeacherSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; // Clear existing subjects
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        toBeAddedSubjects.innerHTML = ''; // Clear toBeAddedSubjects
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            // Initial fetch of subjects
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            // Collecting updated subjects upon form submission
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                // Add the updated subjects to the form data
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                // Send the form data using fetch
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
 
 
 
@@ -1827,13 +4217,882 @@ fetch('/chmDepartmentInstructors')
                         
                         modalRemove.classList.remove('modalHidden')
                         body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; // Assuming the id contains the full name
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) // Sending the full name in the request body
+    })
+    .then(response => {
+        if (response.ok) {
+            // Successfully deleted
+            // You can update your UI accordingly
+        } else {
+            // Handle error
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
                     })
                 }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        formAdd.reset()
+        modalAddTeacher.remove()
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
+            }).catch((e)=>{
+                 console.log(e.message)
+            })
+        /* instructorListContainer.innerHTML = ""
+
+        fetch(`/${adminId}/ccjeDepartmentInstructors`)
+
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); 
+            })
+            .then(data => {
+
+                const { allTeachers } = data;
+                for (let teacher of allTeachers) {
+                const eachTeacherContainer = document.createElement('div');
+                eachTeacherContainer.classList.add('eachTeacherContainer');
+
+
+                const teacherInfoContainer = document.createElement('div');
+                teacherInfoContainer.classList.add('teacherInfoContainer');
+                
+                const spanName = document.createElement('span')
+                spanName.id = 'fullname'
+                spanName.innerHTML = `Name: ${teacher.firstname} ${teacher.lastname}` 
+                const spanFirstname = document.createElement('span');
+
+                spanFirstname.id = 'firstname';
+                spanFirstname.innerHTML = `Firstname: ${teacher.firstname}`;
+
+                const spanLastname = document.createElement('span');
+                spanLastname.id = 'lastname';
+                spanLastname.innerHTML = `Lastname: ${teacher.lastname}`;
+
+                const spanSubjects = document.createElement('span');
+                spanSubjects.id = 'subjects';
+                spanSubjects.innerHTML = `Subjects: ${teacher.subjects.map(subject => subject.code).join(', ')}`;
+
+                teacherInfoContainer.appendChild(spanName);
+                teacherInfoContainer.appendChild(spanSubjects);
+                    
+                    
+
+                    const teacherOptionsContainer = document.createElement('div')
+                    teacherOptionsContainer.classList.add('teacherOptionsContainer')
+                    const updateIcon = document.createElement('div')
+                    updateIcon.classList.add('updateIcon')
+                    const elementUpdateIconImg = document.createElement('img')
+                    elementUpdateIconImg.src = '/images/updateIcon.svg'
+                    updateIcon.id = `${teacher.fullname}`
+                    updateIcon.appendChild(elementUpdateIconImg)
+
+
+
+
+                    const removeIcon = document.createElement('div')
+                    removeIcon.classList.add('removeIcon')
+                    const elementRemoveIconImg = document.createElement('img')
+                    elementRemoveIconImg.src = '/images/removeIcon.svg'
+                    removeIcon.appendChild(elementRemoveIconImg)
+                    removeIcon.id = `${teacher.fullname}`
+
+
+
+                    teacherOptionsContainer.appendChild(updateIcon)
+                    teacherOptionsContainer.appendChild(removeIcon)
+
+
+                   
+
+
+                    eachTeacherContainer.appendChild(teacherInfoContainer)
+                    eachTeacherContainer.appendChild(teacherOptionsContainer)
+                    
+                    instructorListContainer.appendChild(eachTeacherContainer)
+
+
+                }
+                 const addTeacherContainer = document.createElement('div')
+                    addTeacherContainer.classList.add('addTeacherContainer')
+                    instructorListContainer.appendChild(addTeacherContainer)
+
+                    const addTeacherContainerH1 = document.createElement('h1')
+                    addTeacherContainerH1.innerHTML = "+"
+                    addTeacherContainer.appendChild(addTeacherContainerH1)
+
+
+
+
+
+                const updateIcon = document.querySelectorAll('.updateIcon');
+
+for (let icon of updateIcon) {
+    icon.addEventListener('click', () => {
+
+        fetch(`/${adminId}/findTeacher?teacherName=${encodeURIComponent(icon.id)}`).then((response) => {
+            if (!response.ok) {
+                throw new Error('There is an error while fetching');
+            }
+            return response.json();
+        }).then(data => {
+            const foundTeacher = data.foundTeacher;
+
+            const updateFormForm = document.createElement('form');
+            updateFormForm.action = `/${adminId}/${foundTeacher._id}/updateForm`;
+            updateFormForm.method = 'POST';
+            updateFormForm.enctype = 'multipart/form-data';
+
+            const modalUpdate = document.createElement('div');
+            modalUpdate.classList.add('modalUpdate');
+
+            const modalBackground = document.createElement('div');
+            modalBackground.classList.add('modalBackground');
+
+            const modalUpdateForm = document.createElement('div');
+            modalUpdateForm.classList.add('modalUpdateForm');
+            updateFormForm.appendChild(modalUpdateForm);
+
+            const modalUpdateFormP = document.createElement('p');
+            modalUpdateFormP.innerHTML = `Update Information`;
+            modalUpdateForm.appendChild(modalUpdateFormP);
+
+            const updateInfoContainer = document.createElement('div');
+            updateInfoContainer.classList.add('updateInfoContainer');
+            modalUpdateForm.appendChild(updateInfoContainer);
+
+            const inputsContainer = document.createElement('div');
+            inputsContainer.classList.add('inputsContainer');
+            updateInfoContainer.appendChild(inputsContainer);
+
+            const Firstname = document.createElement('input');
+            Firstname.type = 'text';
+            Firstname.placeholder = 'Firstname';
+            Firstname.name = 'firstname';
+            Firstname.value = `${foundTeacher.firstname}`;
+            inputsContainer.appendChild(Firstname);
+
+            const Lastname = document.createElement('input');
+            Lastname.type = 'text';
+            Lastname.placeholder = 'Lastname';
+            Lastname.name = 'lastname';
+            Lastname.value = `${foundTeacher.lastname}`;
+            inputsContainer.appendChild(Lastname);
+
+            const department = document.createElement('select');
+            department.name = 'department';
+            department.id = 'updateDepartmentSelect';
+
+            const selectDepartment = document.createElement('option');
+            selectDepartment.innerHTML = "SELECT DEPARTMENT";
+            department.appendChild(selectDepartment);
+
+            const departments = ["CET", "CBA", "CEAA", "CHM", "CNHS", "CCJE"];
+            departments.forEach(dep => {
+                const option = document.createElement('option');
+                option.value = dep;
+                option.innerHTML = dep;
+                if (dep === foundTeacher.department) {
+                    option.selected = true;
+                }
+                department.appendChild(option);
+            });
+
+            const addSubjectsContainer = document.createElement('div');
+            addSubjectsContainer.classList.add('addSubjectsContainer');
+
+            const toBeAddedSubjects = document.createElement('div');
+            toBeAddedSubjects.classList.add('toBeAddedSubjects');
+
+            const addedSubjects = document.createElement('div');
+            addedSubjects.classList.add('addedSubjects');
+            addSubjectsContainer.appendChild(addedSubjects);
+            addSubjectsContainer.appendChild(toBeAddedSubjects);
+
+            inputsContainer.appendChild(department);
+            inputsContainer.appendChild(addSubjectsContainer);
+
+            department.addEventListener('change', () => {
+                console.log('meow');
+                fetchAndDisplaySubjects(department.value);
+            });
+
+            const fetchAndDisplaySubjects = (department) => {
+                fetch(`/${adminId}/getSubjects?subjectIds=${JSON.stringify(foundTeacher.subjects)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(subjects => {
+                        addedSubjects.innerHTML = ''; 
+                        subjects.forEach(subject => {
+                            addSubjectToAddedSubjects(subject);
+                        });
+
+                        return fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(department)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('There is an error while fetching available subjects');
+                        }
+                        return response.json();
+                    })
+                    .then(available => {
+                        console.log(available)
+                        toBeAddedSubjects.innerHTML = ''; 
+                        available.forEach(subject => {
+                            if (!foundTeacher.subjects.includes(subject._id)) {
+                                addSubjectToToBeAddedSubjects(subject);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching subjects:', error));
+            };
+
+            fetchAndDisplaySubjects(foundTeacher.department);
+
+            const updateButtonContainer = document.createElement('div');
+            updateButtonContainer.classList.add('updateButtonContainer');
+            modalUpdateForm.appendChild(updateButtonContainer);
+
+            const updateButtonContainerButton = document.createElement('button');
+            updateButtonContainerButton.innerHTML = "Save";
+            updateButtonContainerButton.type = 'submit';
+            updateButtonContainer.appendChild(updateButtonContainerButton);
+
+            const exitBtnModalUpdate = document.createElement('div');
+            exitBtnModalUpdate.classList.add('exitBtnModalUpdate');
+            exitBtnModalUpdate.innerHTML = '+';
+            exitBtnModalUpdate.onclick = () => {
+                modalUpdate.remove();
+            };
+
+            modalUpdateForm.appendChild(exitBtnModalUpdate);
+
+            modalUpdate.appendChild(modalBackground);
+            modalUpdate.appendChild(updateFormForm);
+            document.body.appendChild(modalUpdate);
+
+            updateFormForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const updatedSubjects = [];
+                addedSubjects.querySelectorAll('.eachSub').forEach(item => {
+                    const subjectCode = item.firstChild.textContent.trim();
+                    updatedSubjects.push(subjectCode);
+                });
+
+                const formData = new FormData(updateFormForm);
+                formData.append('subjects', JSON.stringify(updatedSubjects));
+
+                fetch(updateFormForm.action, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update the instructor');
+                    }
+                    return response.json();
+                }).then(result => {
+                    console.log('Instructor updated successfully:', result);
+                    modalUpdate.remove();
+                }).catch(error => console.error('Error updating instructor:', error));
+            });
+
+            function addSubjectToAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    addedSubjects.removeChild(eachSub);
+                    addSubjectToToBeAddedSubjects(subject);
+                });
+
+                addedSubjects.appendChild(eachSub);
+            }
+
+            function addSubjectToToBeAddedSubjects(subject) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+                eachSub.textContent = subject.code;
+
+                eachSub.addEventListener('click', () => {
+                    toBeAddedSubjects.removeChild(eachSub);
+                    addSubjectToAddedSubjects(subject);
+                });
+
+                toBeAddedSubjects.appendChild(eachSub);
+            }
+        }).catch(error => {
+            console.error('Error fetching teacher:', error);
+        });
+    });
+}
+
+
+
+
+                const removeIcon = document.querySelectorAll('.removeIcon')
+
+                for(let icon of removeIcon){
+                    icon.addEventListener('click', ()=> {
+                        const modalRemove = document.createElement('div')
+                        modalRemove.classList.add('modalRemove')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+                        modalRemove.appendChild(modalBackground)
+
+
+                        const modalRemoveForm = document.createElement('div')
+                        modalRemoveForm.classList.add('modalRemoveForm')
+                        modalRemove.appendChild(modalRemoveForm)
+
+
+                        const modalRemoveTextsContainer = document.createElement('div')
+                        modalRemoveTextsContainer.classList.add('modalRemoveTextsContainer')
+                        const modalRemoveTextsContainerP = document.createElement('p')
+                        modalRemoveTextsContainerP.innerHTML = `Are you sure you are going to remove ${icon.id}`
+                        modalRemoveTextsContainer.appendChild(modalRemoveTextsContainerP)
+                        modalRemoveForm.appendChild(modalRemoveTextsContainer)
+
+
+                        const modalRemoveButtonsContainer = document.createElement('div')
+                        modalRemoveButtonsContainer.classList.add('modalRemoveButtonsContainer')
+                        modalRemoveForm.appendChild(modalRemoveButtonsContainer)
+                        const modalRemoveButtonsContainerNo = document.createElement('button')
+                        modalRemoveButtonsContainerNo.innerHTML = 'No'
+                        modalRemoveButtonsContainerNo.id = "confirmNo"
+
+                        const modalRemoveButtonsContainerYes = document.createElement('button')
+                        modalRemoveButtonsContainerYes.innerHTML = 'Yes'
+                        modalRemoveButtonsContainerYes.id = "confirmYes"
+
+
+                        modalRemoveButtonsContainer.appendChild(modalRemoveButtonsContainerNo)
+                        modalRemoveButtonsContainer.appendChild(modalRemoveButtonsContainerYes)
+                        
+
+                        const exitBtnModalRemove = document.createElement('div')
+                        exitBtnModalRemove.classList.add('exitBtnModalRemove')
+                        exitBtnModalRemove.innerHTML = '+'
+                        modalRemoveForm.appendChild(exitBtnModalRemove)
+                        exitBtnModalRemove.onclick = () => {
+                            modalRemove.classList.add('modalHidden')
+                        }
+                
+
+                        modalRemoveButtonsContainerNo.onclick = () => {
+                            modalRemove.classList.add('modalHidden')
+                        }
+                     
+                        
+                        modalRemove.classList.remove('modalHidden')
+                        body.appendChild(modalRemove)
+
+
+                        modalRemoveButtonsContainerYes.addEventListener('click', () => {
+    const teacherFullName = icon.id; 
+                            console.log(teacherFullName)
+    fetch(`/${adminId}/removeInstructor`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fullName: teacherFullName }) 
+    })
+    .then(response => {
+        if (response.ok) {
+        } else {
+            console.error('Failed to delete teacher');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    }); 
+});
+
+
+
+                    })
+                }
+
+
+                        const addTeacherButton = document.querySelector('.addTeacherContainer')
+
+                        addTeacherButton.addEventListener('click', ()=> {
+
+                        const formAdd = document.createElement('form')
+                        formAdd.action ='/addForm'
+                        formAdd.method ='POST'
+                        formAdd.enctype = 'multipart/form-data'
+                        const modalAddTeacher = document.createElement('div')
+                        modalAddTeacher.classList.add('modalAddTeacher')
+
+
+                        const modalBackground = document.createElement('div')
+                        modalBackground.classList.add('modalBackground')
+
+
+                        const modalAddTeacherForm = document.createElement('div')
+                        modalAddTeacherForm.classList.add('modalAddTeacherForm')
+
+                        const modalAddTeacherFormP = document.createElement('p')
+                        modalAddTeacherFormP.innerHTML = `Add Teacher`
+                        modalAddTeacherForm.appendChild(modalAddTeacherFormP)
+
+                        const addTeacherInfoContainer = document.createElement('div')
+                        addTeacherInfoContainer.classList.add('addTeacherInfoContainer')
+                        modalAddTeacherForm.appendChild(addTeacherInfoContainer)
+
+                       
+                        
+                        const inputsContainer = document.createElement('div')
+                        inputsContainer.classList.add('inputsContainer')
+                        addTeacherInfoContainer.appendChild(inputsContainer)
+
+                        const Firstname = document.createElement('input')
+                        Firstname.type = 'text'
+                        Firstname.placeholder = 'Firstname'
+                        Firstname.name = 'firstname'
+                        Firstname.id = 'firstname'
+                        inputsContainer.appendChild(Firstname)
+
+                        const Lastname = document.createElement('input')
+                        Lastname.type = 'text'
+                        Lastname.placeholder = 'Lastname'
+                        Lastname.name = 'lastname'
+                        Lastname.id = 'lastname'
+                        inputsContainer.appendChild(Lastname)
+                        
+                        const department = document.createElement('select')
+                        department.name = 'department'
+                        department.id = 'addFormDepartment'
+                        department.classList.add('department')
+                        const selectDepartment = document.createElement('option')
+
+                        selectDepartment.innerHTML = "SELECT DEPARTMENT"
+                        department.appendChild(selectDepartment)
+
+                        const CET = document.createElement('option')
+                        CET.value = "CET"
+                        CET.innerHTML = "CET"
+                        department.appendChild(CET)
+
+                        const CBA = document.createElement('option')
+                        CBA.value = "CBA"
+                        CBA.innerHTML = "CBA"
+                        department.appendChild(CBA)
+
+                        const CEAA = document.createElement('option')
+                        CEAA.value = "CEAA"
+                        CEAA.innerHTML = "CEAA"
+                        department.appendChild(CEAA)
+
+                        const CHM = document.createElement('option')
+                        CHM.value = "CHM"
+                        CHM.innerHTML = "CHM"
+                        department.appendChild(CHM)
+
+                        const CNHS = document.createElement('option')
+                        CNHS.value = "CNHS"
+                        CNHS.innerHTML = "CNHS"
+                        department.appendChild(CNHS)
+
+                        const CCJE = document.createElement('option')
+                        CCJE.value = "CCJE"
+                        CCJE.innerHTML = "CCJE"
+                        department.appendChild(CCJE)
+
+
+                        
+
+                        const addSubjectsContainer = document.createElement('div')
+                        addSubjectsContainer.classList.add('addSubjectsContainer')
+
+
+
+                        const addedSubjects = document.createElement('div')
+                        addedSubjects.classList.add('addedSubjects')
+                        addSubjectsContainer.appendChild(addedSubjects)
+
+                        const toBeAddedSubjects = document.createElement('div')
+                        toBeAddedSubjects.classList.add('toBeAddedSubjects')
+                        addSubjectsContainer.appendChild(toBeAddedSubjects)
+
+                   
+                        
+                        const addTeacherButtonContainer = document.createElement('div')
+                        addTeacherButtonContainer.classList.add('addTeacherButtonContainer')
+                        modalAddTeacherForm.appendChild(addTeacherButtonContainer)
+
+                        const addTeacherButtonContainerButton = document.createElement('button')
+                        addTeacherButtonContainerButton.innerHTML = "Add"
+                        addTeacherButtonContainer.appendChild(addTeacherButtonContainerButton)
+
+                        const exitBtnModalAddTeacher = document.createElement('div')
+                        exitBtnModalAddTeacher.classList.add('exitBtnModalAddTeacher')
+                        exitBtnModalAddTeacher.innerHTML = '+'
+                        exitBtnModalAddTeacher.onclick = () => {
+                            modalAddTeacher.remove()
+                        }
+                       
+                        modalAddTeacherForm.appendChild(exitBtnModalAddTeacher)
+
+                        inputsContainer.appendChild(department)
+                        modalAddTeacher.appendChild(modalBackground)
+                        modalAddTeacher.appendChild(modalAddTeacherForm)
+                        inputsContainer.appendChild(addSubjectsContainer)
+
+                        
+                        body.appendChild(modalAddTeacher)
+                        formAdd.appendChild(modalAddTeacherForm)
+                        modalAddTeacher.appendChild(formAdd)
+                    
+
+                    const departmentElement = document.querySelector('.department');
+departmentElement.addEventListener('change', () => {
+    const toBeAddedSubjectsContainer = document.querySelector('.toBeAddedSubjects');
+    toBeAddedSubjectsContainer.innerHTML = '';
+    
+    const queryString = `/${adminId}/subjectCodes?department=${encodeURIComponent(departmentElement.value)}`;
+    fetch(queryString)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('The fetch network is not okay.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const toBeAddedSubjects = document.querySelector('.toBeAddedSubjects');
+            const addedSubjects = document.querySelector('.addedSubjects');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'subjectCodes';
+            hiddenInput.value = '';
+            hiddenInput.id = 'hiddenInput'
+            formAdd.appendChild(hiddenInput);
+            const subjects = data.allSubs;
+
+            subjects.forEach((subject) => {
+                const eachToBeAddedSub = document.createElement('div');
+                eachToBeAddedSub.classList.add('eachToBeAddedSub');
+                eachToBeAddedSub.textContent = subject.code;
+
+                toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                eachToBeAddedSub.addEventListener('click', () => {
+                    const eachSub = document.createElement('div');
+                    eachSub.classList.add('eachSub');
+                    eachSub.textContent = subject.code;
+
+                    const exitButton = document.createElement('div');
+                    exitButton.classList.add('exitButton');
+                    exitButton.textContent = '+';
+                    eachSub.appendChild(exitButton);
+
+                    addedSubjects.appendChild(eachSub);
+                    eachToBeAddedSub.remove(); 
+
+                    updateHiddenInput(hiddenInput, subject.code, 'add');
+                    console.log(hiddenInput)
+                    exitButton.addEventListener('click', () => {
+                        eachSub.remove();
+                        toBeAddedSubjects.appendChild(eachToBeAddedSub);
+
+                        updateHiddenInput(hiddenInput, subject.code, 'remove');
+                    });
+                });
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+ formAdd.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const addedSubjectsElement = document.querySelectorAll('.eachSub');
+    const firstnameInput = document.querySelector('#firstname')
+    const lastnameInput = document.querySelector('#lastname')
+    const depSelect = document.querySelector('#addFormDepartment')
+
+    const addedSubs = [];
+    
+    addedSubjectsElement.forEach((subject) => {
+        addedSubs.push(subject.firstChild.textContent.trim());
+    });
+
+    const queryString = `/${adminId}/addForm?firstname=${encodeURIComponent(firstnameInput.value)}&lastname=${encodeURIComponent(lastnameInput.value)}&department=${encodeURIComponent(depSelect.value)}&subjectCodes=${addedSubs}`
+    fetch(queryString, {
+        method: 'POST'
+    }).then((response)=>{
+        if(!response.ok){
+            throw new Error('there is an error in posting /addForm')
+        }
+        return response.json()
+    }).then((data)=>{
+        
+    }).catch((error)=>{
+        console.log(error.message)
+    })
+
+    
+});
+                                
+                            
+                        })
             })
 
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
-            });
+            }); */
+            
     }
 });
 
@@ -2027,6 +5286,9 @@ fetch('/chmDepartmentInstructors')
  */
            
         }else if(option.innerHTML === 'Questions'){
+            subjectBody.style.display = 'none';
+
+
            const questionUpperPart = document.createElement('div')
            questionUpperPart.classList.add('questionUpperPart')
 
@@ -2281,6 +5543,65 @@ function fetchAndRenderQuestions(category) {
         });
 
         addRemoveQuestionEventListeners();
+
+
+        const allQuestions = document.querySelectorAll('.eachQuestion')
+
+        allQuestions.forEach((question)=>{
+            question.addEventListener('click',()=>{
+                const questionText = question.firstChild.firstChild.innerHTML
+
+                fetch(`/${adminId}/getQuestionInfo?question=${encodeURIComponent(questionText)}`).then((response)=>{
+                    if(!response.ok){
+                        throw new Error('There is an error fetching to update question.')
+                    }
+                    return response.json()
+                }).then((data)=>{
+                    const updateQuestionModal = document.querySelector('.updateQuestionModal')
+
+                    updateQuestionModal.style.display = 'block'
+
+                    const updateQuestionexitButtonContainer = document.querySelector('.updateQuestionexitButtonContainer')
+
+                    updateQuestionexitButtonContainer.addEventListener('click',()=>{
+                    updateQuestionModal.style.display = 'none'
+
+                    })
+
+                    const updateQuestionCategory = document.querySelector('#updateQuestionCategory')
+                    updateQuestionCategory.value = data.questionCategory
+
+                    const updateQuestionTextInput = document.querySelector('#updateQuestionTextInput')
+                    updateQuestionTextInput.value = data.text
+
+                    const updateQuestionForm = document.querySelector('#updateQuestionForm')
+                    updateQuestionForm.addEventListener('submit',(event)=>{
+                        event.preventDefault()
+
+               
+                    fetch(`/${adminId}/${data._id}/updateQuestion?questionCategory=${encodeURIComponent(updateQuestionCategory.value)}&questionText=${encodeURIComponent(updateQuestionTextInput.value)}`, {
+                        method: 'PUT'
+                    }).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('There is an error trying to update question.')
+                        }
+                        return response.json()
+                    }).then((data)=>{
+                        updateQuestionForm.reset()
+                        updateQuestionModal.style.display = 'none'
+
+                    }).catch((e)=>{
+                        console.log(e.message)
+                    })
+
+                    })
+                    
+                }).catch((e)=>{
+                    console.log(e.message)
+                })
+            })
+        })
+
     }).catch((e) => {
         console.log(e.message);
     });
@@ -2289,7 +5610,8 @@ function fetchAndRenderQuestions(category) {
 function addRemoveQuestionEventListeners() {
     const questionButtonContainerElement = document.querySelectorAll('.questionButtonContainer');
     questionButtonContainerElement.forEach((element) => {
-        element.addEventListener('click', () => {
+        element.addEventListener('click', (event) => {
+            event.stopPropagation()
             const removeQuestionModal = document.createElement('div');
             removeQuestionModal.classList.add('removeQuestionModal');
 
@@ -2398,6 +5720,9 @@ questionSelectElement.addEventListener('change', () => {
 
            
         }else if(option.innerHTML === 'Students'){
+
+            subjectBody.style.display = 'none';
+
             const filterOptionsContainer = document.createElement('div')
             filterOptionsContainer.classList.add('filterOptionsContainer')
 
@@ -2524,7 +5849,7 @@ questionSelectElement.addEventListener('change', () => {
             const uploadFormElement = document.createElement('form')
             uploadFormElement.ref = 'uploadForm'
             uploadFormElement.id = 'uploadForm'
-            uploadFormElement.action = '/uploadTest'
+            uploadFormElement.action = `/${adminId}/uploadTest`
             uploadFormElement.method = 'POST'
             uploadFormElement.enctype = 'multipart/form-data'
 
@@ -2583,6 +5908,10 @@ questionSelectElement.addEventListener('change', () => {
             colProgram.appendChild(colProgramP)
             column.appendChild(colProgram)
 
+            const colBlankDiv = document.createElement('span')
+            colBlankDiv.classList = 'colBlankDiv'
+            column.appendChild(colBlankDiv)
+
             studentListContainer.appendChild(column)
 
             const innerstudentListContainerElement = document.createElement('div')
@@ -2599,11 +5928,359 @@ questionSelectElement.addEventListener('change', () => {
             removeStudentsButton.innerHTML = 'Remove Students'
             removeStudentsButton.disabled = true
 
+            const addIndividualStudentContainer = document.createElement('div')
+            addIndividualStudentContainer.classList.add('addIndividualStudentContainer')
+
+            const addIndividualStudentButton = document.createElement('button')
+            addIndividualStudentButton.id = 'addIndividualStudentButton'
+            addIndividualStudentButton.innerHTML = '+'
+            addIndividualStudentContainer.appendChild(addIndividualStudentButton)
+
             deleteStudentsContainer.appendChild(removeStudentsButton)
             innerRightContainer.appendChild(deleteStudentsContainer)
+            innerRightContainer.appendChild(addIndividualStudentContainer)
 
 
 
+            addIndividualStudentButton.addEventListener('click',()=>{
+                addIndividualStudentModal.style.display = 'block'
+
+
+                const indivStudentForm = document.querySelector('#indivStudentForm')
+
+                indivStudentForm.addEventListener('submit',(event)=>{
+                    event.preventDefault()
+
+                    const indivStudentID = document.querySelector('#indivStudentID')
+                    const indivStudentName = document.querySelector('#indivStudentName')
+                    const indivStudentEmail = document.querySelector('#indivStudentEmail')
+                    const indivStudentDep = document.querySelector('#indivStudentDepartment')
+                    const indivStudentProg = document.querySelector('#indivStudentProgram')
+                    const indivStudentYear = document.querySelector('#indivStudentYear')
+                    const studentAddedSubject = document.querySelectorAll('.studentAddedSubject')
+                    
+
+                    console.log(indivStudentID)
+                  const subjects = [];
+studentAddedSubject.forEach((subject) => {
+  subjects.push(subject.firstChild.innerHTML);
+});
+const data = {
+  studentID: Number(indivStudentID.value), // Ensure it is a number
+  studentName: indivStudentName.value,
+  studentEmail: indivStudentEmail.value,
+  studentDepartment: indivStudentDep.value,
+  studentProgram: indivStudentProg.value,
+  studentYear: indivStudentYear.value,
+  studentSubjects: subjects
+};
+
+
+ fetch(`/${adminId}/addIndividualStudent`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('There is an error adding individual student');
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data);
+    // Clear all input fields and select elements
+    document.querySelector('#indivStudentForm').reset();
+    document.querySelector('.studentAddedSubs').innerHTML = ''
+    // Hide the modal (assuming you are using Bootstrap)
+    document.querySelector('.addIndividualStudentModal').style.display = 'none'
+  })
+  .catch((e) => {
+    console.log(e.message);
+  });
+
+/* fetch(`/${adminId}/addIndividualStudent`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('There is an error adding individual student');
+    }
+    return response.json();
+  })
+  .then((data) => {
+    indivStudentForm.reset()
+
+    addIndividualStudentModal.style.display = 'none'
+
+    // Handle successful response
+  })
+  .catch((e) => {
+    console.log(e.message);
+  }); */
+                })
+
+
+                const exitButton = document.querySelector('#addIndividualStudentExitButton')
+                exitButton.addEventListener('click',()=>{
+                    addIndividualStudentModal.style.display = 'none'
+                })
+
+                const indivStudentDepartment = document.querySelector('#indivStudentDepartment')
+                indivStudentDepartment.addEventListener('change', ()=>{
+                const indivStudentProgram = document.querySelector('#indivStudentProgram') 
+                const indivStudentYear = document.querySelector('#indivStudentYear') 
+                    if(indivStudentDepartment.value === 'CET'){
+                        const cetPrograms = ['BSIT','BSCPE', 'BSCE','BSGE']
+                        indivStudentProgram.innerHTML =''
+                        cetPrograms.forEach(program=>{
+                            let cetOption = document.createElement('option')
+                            cetOption.value = program
+                            cetOption.innerHTML = program
+                            indivStudentProgram.appendChild(cetOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(indivStudentDepartment.value === 'CBA'){
+                        const cbaPrograms = ['BSAHRM', 'BSBAMM','BSA']
+                        indivStudentProgram.innerHTML =''
+                        cbaPrograms.forEach(program=>{
+                            let cbaOption = document.createElement('option')
+                            cbaOption.value = program
+                            cbaOption.innerHTML = program
+                            indivStudentProgram.appendChild(cbaOption)
+                        })
+                        const programYear = ['1st','2nd','3rd']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(indivStudentDepartment.value === 'CEAA'){
+                        const ceaaPrograms = ['BEE', 'BSEDFIL','BSEDVRE', 'BSEDMATH', 'BAPS', 'BSEDENG','BSEDVE']
+                        indivStudentProgram.innerHTML =''
+                        ceaaPrograms.forEach(program=>{
+                            let ceaaOption = document.createElement('option')
+                            ceaaOption.value = program
+                            ceaaOption.innerHTML = program
+                            indivStudentProgram.appendChild(ceaaOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(indivStudentDepartment.value === 'CHM'){
+                        const chmPrograms = ['BSHM']
+                        indivStudentProgram.innerHTML =''
+                        chmPrograms.forEach(program=>{
+                            let chmOption = document.createElement('option')
+                            chmOption.value = program
+                            chmOption.innerHTML = program
+                            indivStudentProgram.appendChild(chmOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(indivStudentDepartment.value === 'CNHS'){
+                        const cnhsPrograms = ['BSN', 'BSBIO']
+                        indivStudentProgram.innerHTML =''
+                        cnhsPrograms.forEach(program=>{
+                            let cnhsOption = document.createElement('option')
+                            cnhsOption.value = program
+                            cnhsOption.innerHTML = program
+                            indivStudentProgram.appendChild(cnhsOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd', '4th']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(indivStudentDepartment.value === 'CCJE'){
+                        const ccjePrograms = ['BSCRIM']
+                        indivStudentProgram.innerHTML =''
+                        ccjePrograms.forEach(program=>{
+                            let ccjeOption = document.createElement('option')
+                            ccjeOption.value = program
+                            ccjeOption.innerHTML = program
+                            indivStudentProgram.appendChild(ccjeOption)
+                    })
+                    const programYear = ['1st','2nd','3rd']
+                        indivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            indivStudentYear.appendChild(yearOption)
+
+                        })
+                
+                    }
+
+
+                    fetch(`/${adminId}/getIndividualStudentSubject?department=${encodeURIComponent(indivStudentDepartment.value)}`).then((response)=>{
+                         if(!response.ok){
+                            throw new Error('There is an error getting all subjects depending on department')
+                        }
+                        return response.json()
+                    }).then((data)=>{
+                        const subjects = data.subjects
+                        const studentToAddSubs = document.querySelector('.studentToAddSubs')
+                        studentToAddSubs.innerHTML = ''
+                        subjects.forEach((subject)=>{
+                            const eachSub = document.createElement('div')
+                            eachSub.classList.add('eachSub')
+
+                            const eachSubSpan = document.createElement('span')
+                            eachSubSpan.innerHTML = subject.code
+                            eachSub.appendChild(eachSubSpan)
+
+
+                           studentToAddSubs.appendChild(eachSub)
+
+                           
+                        })
+
+                        const allEachSub = document.querySelectorAll('.eachSub')
+                        const studentAddedSubs = document.querySelector('.studentAddedSubs')
+                        allEachSub.forEach((sub)=>{
+                            sub.addEventListener('click',()=>{
+                                addToAddedSubject(sub)
+                                /* const studentAddedSubject = document.createElement('div')
+                                studentAddedSubject.classList.add('studentAddedSubject')
+
+                                const studentAddedSubjectSpan = document.createElement('span')
+                                studentAddedSubjectSpan.innerHTML = sub.firstChild.innerHTML
+                                studentAddedSubject.appendChild(studentAddedSubjectSpan)
+
+                                const exitButton = document.createElement('div')
+                                exitButton.classList.add('exitButton')
+                                exitButton.innerHTML = '+'
+                                
+                                exitButton.addEventListener('click',()=>{
+
+                                    const parentElement =  exitButton.parentElement
+                                    const eachSub = document.createElement('div')
+                                    eachSub.classList.add('eachSub')
+
+                                    const eachSubSpan = document.createElement('span')
+                                    eachSubSpan.innerHTML = parentElement.firstChild.innerHTML
+                                    eachSub.appendChild(eachSubSpan)
+
+                                    studentToAddSubs.appendChild(eachSub)
+
+                                    exitButton.parentElement.remove()
+                                }) 
+
+
+                                studentAddedSubject.appendChild(exitButton)
+
+                                studentAddedSubs.appendChild(studentAddedSubject)
+
+                                sub.remove() */
+
+                            })
+                        })
+
+                        
+
+
+                    }).catch((error)=>{
+                        console.log(error.message)
+                    })
+
+                    
+                })
+
+            })
+
+
+                                  const addToAddedSubject = (subject) => {
+    const studentAddedSubs = document.querySelector('.studentAddedSubs');
+    const studentToAddSubs = document.querySelector('.studentToAddSubs');
+
+    const createstudentAddedSubject = document.createElement('div');
+    createstudentAddedSubject.classList.add('studentAddedSubject');
+
+    const createstudentAddedSubjectSpan = document.createElement('span');
+    createstudentAddedSubjectSpan.innerHTML = subject.firstChild.innerHTML;
+    createstudentAddedSubject.appendChild(createstudentAddedSubjectSpan);
+
+    const createstudentAddedSubjectExitButton = document.createElement('div');
+    createstudentAddedSubjectExitButton.classList.add('exitButton');
+    createstudentAddedSubjectExitButton.innerHTML = '+';
+    createstudentAddedSubject.appendChild(createstudentAddedSubjectExitButton);
+
+    createstudentAddedSubjectExitButton.addEventListener('click', () => {
+        const parentElement = createstudentAddedSubjectExitButton.parentElement;
+        const eachSub = document.createElement('div');
+        eachSub.classList.add('eachSub');
+
+        const eachSubSpan = document.createElement('span');
+        eachSubSpan.innerHTML = parentElement.firstChild.innerHTML;
+
+        eachSub.appendChild(eachSubSpan);
+        studentToAddSubs.appendChild(eachSub);
+
+        eachSub.addEventListener('click', () => {
+            addToAddedSubject(eachSub);
+        });
+
+        parentElement.remove();
+    });
+
+    studentAddedSubs.appendChild(createstudentAddedSubject);
+    subject.remove();
+};
+
+// Adding event listeners to initial subjects
+document.querySelectorAll('.studentToAddSubs .eachSub').forEach(subject => {
+    subject.addEventListener('click', () => {
+        addToAddedSubject(subject);
+    });
+});
 
 
             const departmentSelectElement2 = document.querySelector('#department')
@@ -2712,7 +6389,7 @@ innerFilterOptionContainerSelect.forEach((select)=> {
         const programSelect = document.querySelector('#program')
         const yearSelect= document.querySelector('#year')
         
-        const queryString = `/studentList?year=${encodeURIComponent(yearSelect.value)}&department=${encodeURIComponent(departmentSelect2.value)}&program=${encodeURIComponent(programSelect.value)}`
+        const queryString = `/${adminId}/studentList?year=${encodeURIComponent(yearSelect.value)}&department=${encodeURIComponent(departmentSelect2.value)}&program=${encodeURIComponent(programSelect.value)}`
         fetch(queryString).then((response)=> {
             if(!response.ok){
                 throw new Error('error network in studentList')
@@ -2745,8 +6422,581 @@ innerFilterOptionContainerSelect.forEach((select)=> {
                  programSpan.innerHTML = student.program
                 eachStudent.appendChild(programSpan)
 
+                const eachStudentRemoveContainer = document.createElement('div')
+                eachStudentRemoveContainer.classList.add('eachStudentRemoveContainer')
+
+                const eachStudentremoveButton = document.createElement('button')
+                eachStudentremoveButton.id = `${student.studentID}`
+                eachStudentremoveButton.innerHTML = '-'
+                eachStudentRemoveContainer.appendChild(eachStudentremoveButton)
+                eachStudent.appendChild(eachStudentRemoveContainer)
+
                 innerstudentListContainer.appendChild(eachStudent)
             });
+
+            const allEachStudent = document.querySelectorAll('.eachStudent')
+            const updateIndivStudentForm = document.querySelector('#updateIndivStudentForm')
+
+            const updateIndividualStudentModal = document.querySelector('.updateIndividualStudentModal')
+            allEachStudent.forEach((student)=>{
+                student.addEventListener('click',()=>{
+                    updateIndividualStudentModal.style.display = 'block'
+                   document.querySelector('#updateIndividualStudentExitButton').addEventListener('click',()=>{
+                        updateIndividualStudentModal.style.display = 'none'
+                    })
+
+                    updateIndivStudentForm.addEventListener('submit',(event)=>{
+                        event.preventDefault()
+                        console.log('meow')
+
+                        const updateindivStudentID = document.querySelector('#updateindivStudentID')
+                    const updateindivStudentName = document.querySelector('#updateindivStudentName')
+                    const updateindivStudentEmail = document.querySelector('#updateindivStudentEmail')
+                    const updateindivStudentDep = document.querySelector('#updateindivStudentDepartment')
+                    const updateindivStudentProg = document.querySelector('#updateindivStudentProgram')
+                    const updateindivStudentYear = document.querySelector('#updateindivStudentYear')
+                    const studentAddedSubject = document.querySelectorAll('.studentAddedSubject')
+                    
+
+                  const subjects = [];
+studentAddedSubject.forEach((subject) => {
+  subjects.push(subject.firstChild.innerHTML);
+});
+const data = {
+  studentID: Number(updateindivStudentID.value), // Ensure it is a number
+  studentName: updateindivStudentName.value,
+  studentEmail: updateindivStudentEmail.value,
+  studentDepartment: updateindivStudentDep.value,
+  studentProgram: updateindivStudentProg.value,
+  studentYear: updateindivStudentYear.value,
+  studentSubjects: subjects
+};
+
+
+ fetch(updateIndivStudentForm.action, {
+    method: 'PUT',  // Change from POST to PUT
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)  // The data object should include the necessary information for updating the student
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('There is an error updating individual student');
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(data);
+    // Clear all input fields and select elements
+    document.querySelector('#updateIndivStudentForm').reset();  // Make sure to use the correct form ID
+    document.querySelector('.updatestudentAddedSubs').innerHTML = '';  // Clear added subjects
+    document.querySelector('.updatestudentToAddSubs').innerHTML = '';  // Clear subjects to add
+    // Hide the modal
+    document.querySelector('.updateIndividualStudentModal').style.display = 'none';
+  })
+  .catch((e) => {
+    console.log(e.message);
+  });
+
+                    })
+
+                    let studentID = student.lastChild.firstChild.id
+                    fetch(`/${adminId}/getStudentInfo?studentName=${encodeURIComponent(student.firstChild.innerHTML)}&studentID=${encodeURIComponent(studentID)}`).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('There is an error getting info of a Student.')
+                        }
+                        return response.json()
+                    }).then((data)=>{
+
+                        updateIndivStudentForm.action = `/${adminId}/${data._id}/updateIndividualStudent?_method=PUT`
+
+                        const updateindivStudentID = document.querySelector('#updateindivStudentID')
+                        const updateindivStudentName = document.querySelector('#updateindivStudentName')
+                        const updateindivStudentEmail = document.querySelector('#updateindivStudentEmail')
+                        const updateindivStudentDepartment = document.querySelector('#updateindivStudentDepartment')
+                        const updateindivStudentProgram = document.querySelector('#updateindivStudentProgram')
+                        const updateindivStudentYear = document.querySelector('#updateindivStudentYear')
+                        const updatestudentAddedSubs = document.querySelector('.updatestudentAddedSubs')
+                        const updatestudentToAddSubs = document.querySelector('.updatestudentToAddSubs')
+                        updatestudentAddedSubs.innerHTML = ''
+                        updatestudentToAddSubs.innerHTML = ''
+
+
+                        updateindivStudentID.value = data.studentID
+                        updateindivStudentName.value = data.name
+                        updateindivStudentEmail.value = data.email
+                        updateindivStudentDepartment.value =  data.department
+
+                        if(updateindivStudentDepartment.value === 'CET'){
+                        const cetPrograms = ['BSIT','BSCPE', 'BSCE','BSGE']
+                        updateindivStudentProgram.innerHTML =''
+                        cetPrograms.forEach(program=>{
+                            let cetOption = document.createElement('option')
+                            cetOption.value = program
+                            cetOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cetOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(updateindivStudentDepartment.value === 'CBA'){
+                        const cbaPrograms = ['BSAHRM', 'BSBAMM','BSA']
+                        updateindivStudentProgram.innerHTML =''
+                        cbaPrograms.forEach(program=>{
+                            let cbaOption = document.createElement('option')
+                            cbaOption.value = program
+                            cbaOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cbaOption)
+                        })
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(updateindivStudentDepartment.value === 'CEAA'){
+                        const ceaaPrograms = ['BEE', 'BSEDFIL','BSEDVRE', 'BSEDMATH', 'BAPS', 'BSEDENG','BSEDVE']
+                        updateindivStudentProgram.innerHTML =''
+                        ceaaPrograms.forEach(program=>{
+                            let ceaaOption = document.createElement('option')
+                            ceaaOption.value = program
+                            ceaaOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(ceaaOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CHM'){
+                        const chmPrograms = ['BSHM']
+                        updateindivStudentProgram.innerHTML =''
+                        chmPrograms.forEach(program=>{
+                            let chmOption = document.createElement('option')
+                            chmOption.value = program
+                            chmOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(chmOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CNHS'){
+                        const cnhsPrograms = ['BSN', 'BSBIO']
+                        updateindivStudentProgram.innerHTML =''
+                        cnhsPrograms.forEach(program=>{
+                            let cnhsOption = document.createElement('option')
+                            cnhsOption.value = program
+                            cnhsOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cnhsOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd', '4th']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CCJE'){
+                        const ccjePrograms = ['BSCRIM']
+                        updateindivStudentProgram.innerHTML =''
+                        ccjePrograms.forEach(program=>{
+                            let ccjeOption = document.createElement('option')
+                            ccjeOption.value = program
+                            ccjeOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(ccjeOption)
+                    })
+                    const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+                    }
+                    updateindivStudentProgram.value = data.program
+                    updateindivStudentYear.value = data.yearLevel
+                    data.subjectsEnrolled.forEach((subject)=>{
+                        const studentAddedSubject = document.createElement('div')
+                        studentAddedSubject.classList.add('studentAddedSubject')
+
+                        const studentAddedSubjectSpan = document.createElement('span')
+                        studentAddedSubjectSpan.innerHTML = subject.code
+
+                        const exitButton = document.createElement('div')
+                        exitButton.classList.add('exitButton')
+                        exitButton.innerHTML = '+'
+
+                        exitButton.addEventListener('click', () => {
+        const parentElement = exitButton.parentElement;
+        const eachSub = document.createElement('div');
+        eachSub.classList.add('eachSub');
+
+        const eachSubSpan = document.createElement('span');
+        eachSubSpan.innerHTML = parentElement.firstChild.innerHTML;
+
+        eachSub.appendChild(eachSubSpan);
+        updatestudentToAddSubs.appendChild(eachSub);
+
+        eachSub.addEventListener('click', () => {
+            updateAddToAddedSubject(eachSub);
+        });
+
+        parentElement.remove();
+    });
+
+                        studentAddedSubject.appendChild(studentAddedSubjectSpan)
+                        studentAddedSubject.appendChild(exitButton)
+
+                        updatestudentAddedSubs.appendChild(studentAddedSubject)
+
+                    })
+
+                    fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(updateindivStudentDepartment.value)}`).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('There is an error getting available subjects for updating students')
+                        }
+                        return response.json()
+                    }).then((data) => {
+        updatestudentToAddSubs.innerHTML = ''
+    
+
+        // Get all the subject codes from updatestudentAddedSubs
+        const existingSubjects = Array.from(updatestudentAddedSubs.querySelectorAll('.studentAddedSubject span'))
+            .map(span => span.innerHTML.trim());
+
+        // Iterate over the new subjects
+        data.forEach((subject) => {
+            // Check if the subject code is not in the existing subjects list
+            if (!existingSubjects.includes(subject.code.trim())) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+
+                const eachSubSpan = document.createElement('span');
+                eachSubSpan.innerHTML = subject.code;
+
+                eachSub.appendChild(eachSubSpan);
+
+                updatestudentToAddSubs.appendChild(eachSub);
+            }
+        });
+
+         const allEachSub = document.querySelectorAll('.eachSub')
+                        const studentAddedSubs = document.querySelector('.studentAddedSubs')
+                        allEachSub.forEach((sub)=>{
+                            sub.addEventListener('click',()=>{
+                                updateAddToAddedSubject(sub)
+                            })
+                        })
+                    }).catch((e)=>{
+                        console.log(e.message)
+                    })
+
+                    updateindivStudentDepartment.addEventListener('change',()=>{
+                        if(updateindivStudentDepartment.value === 'CET'){
+                        const cetPrograms = ['BSIT','BSCPE', 'BSCE','BSGE']
+                        updateindivStudentProgram.innerHTML =''
+                        cetPrograms.forEach(program=>{
+                            let cetOption = document.createElement('option')
+                            cetOption.value = program
+                            cetOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cetOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(updateindivStudentDepartment.value === 'CBA'){
+                        const cbaPrograms = ['BSAHRM', 'BSBAMM','BSA']
+                        updateindivStudentProgram.innerHTML =''
+                        cbaPrograms.forEach(program=>{
+                            let cbaOption = document.createElement('option')
+                            cbaOption.value = program
+                            cbaOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cbaOption)
+                        })
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+                    }else if(updateindivStudentDepartment.value === 'CEAA'){
+                        const ceaaPrograms = ['BEE', 'BSEDFIL','BSEDVRE', 'BSEDMATH', 'BAPS', 'BSEDENG','BSEDVE']
+                        updateindivStudentProgram.innerHTML =''
+                        ceaaPrograms.forEach(program=>{
+                            let ceaaOption = document.createElement('option')
+                            ceaaOption.value = program
+                            ceaaOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(ceaaOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CHM'){
+                        const chmPrograms = ['BSHM']
+                        updateindivStudentProgram.innerHTML =''
+                        chmPrograms.forEach(program=>{
+                            let chmOption = document.createElement('option')
+                            chmOption.value = program
+                            chmOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(chmOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CNHS'){
+                        const cnhsPrograms = ['BSN', 'BSBIO']
+                        updateindivStudentProgram.innerHTML =''
+                        cnhsPrograms.forEach(program=>{
+                            let cnhsOption = document.createElement('option')
+                            cnhsOption.value = program
+                            cnhsOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(cnhsOption)
+                        })
+
+                        const programYear = ['1st','2nd','3rd', '4th']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+
+
+                    }else if(updateindivStudentDepartment.value === 'CCJE'){
+                        const ccjePrograms = ['BSCRIM']
+                        updateindivStudentProgram.innerHTML =''
+                        ccjePrograms.forEach(program=>{
+                            let ccjeOption = document.createElement('option')
+                            ccjeOption.value = program
+                            ccjeOption.innerHTML = program
+                            updateindivStudentProgram.appendChild(ccjeOption)
+                    })
+                    const programYear = ['1st','2nd','3rd']
+                        updateindivStudentYear.innerHTML = ''
+                        programYear.forEach((year)=>{
+                            const yearOption = document.createElement('option')
+                            yearOption.value = year
+                            yearOption.innerHTML = year
+                            updateindivStudentYear.appendChild(yearOption)
+
+                        })
+                    }
+                        fetch(`/${adminId}/getAvailableSubjects?department=${encodeURIComponent(updateindivStudentDepartment.value)}`).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('There is an error getting available subjects for updating students')
+                        }
+                        return response.json()
+                    }).then((data) => {
+        updatestudentToAddSubs.innerHTML = ''
+
+        // Get all the subject codes from updatestudentAddedSubs
+        const existingSubjects = Array.from(updatestudentAddedSubs.querySelectorAll('.studentAddedSubject span'))
+            .map(span => span.innerHTML.trim());
+
+        // Iterate over the new subjects
+        data.forEach((subject) => {
+            // Check if the subject code is not in the existing subjects list
+            if (!existingSubjects.includes(subject.code.trim())) {
+                const eachSub = document.createElement('div');
+                eachSub.classList.add('eachSub');
+
+                const eachSubSpan = document.createElement('span');
+                eachSubSpan.innerHTML = subject.code;
+
+                eachSub.appendChild(eachSubSpan);
+
+                updatestudentToAddSubs.appendChild(eachSub);
+            }
+        });
+
+         const allEachSub = document.querySelectorAll('.eachSub')
+                        const studentAddedSubs = document.querySelector('.studentAddedSubs')
+                        allEachSub.forEach((sub)=>{
+                            sub.addEventListener('click',()=>{
+                                updateAddToAddedSubject(sub)
+                            })
+                        })
+                    }).catch((e)=>{
+                        console.log(e.message)
+                    })
+                    
+                    })
+
+
+                    }).catch((e)=>{ 
+                        console.log(e.message)
+                    })
+                })
+            })
+
+    const updateAddToAddedSubject = (subject) => {
+    const studentAddedSubs = document.querySelector('.updatestudentAddedSubs');
+    const studentToAddSubs = document.querySelector('.updatestudentToAddSubs');
+
+    const createstudentAddedSubject = document.createElement('div');
+    createstudentAddedSubject.classList.add('studentAddedSubject');
+
+    const createstudentAddedSubjectSpan = document.createElement('span');
+    createstudentAddedSubjectSpan.innerHTML = subject.firstChild.innerHTML;
+    createstudentAddedSubject.appendChild(createstudentAddedSubjectSpan);
+
+    const createstudentAddedSubjectExitButton = document.createElement('div');
+    createstudentAddedSubjectExitButton.classList.add('exitButton');
+    createstudentAddedSubjectExitButton.innerHTML = '+';
+    createstudentAddedSubject.appendChild(createstudentAddedSubjectExitButton);
+
+    createstudentAddedSubjectExitButton.addEventListener('click', () => {
+        const parentElement = createstudentAddedSubjectExitButton.parentElement;
+        const eachSub = document.createElement('div');
+        eachSub.classList.add('eachSub');
+
+        const eachSubSpan = document.createElement('span');
+        eachSubSpan.innerHTML = parentElement.firstChild.innerHTML;
+
+        eachSub.appendChild(eachSubSpan);
+        studentToAddSubs.appendChild(eachSub);
+
+        eachSub.addEventListener('click', () => {
+            updateAddToAddedSubject(eachSub);
+        });
+
+        parentElement.remove();
+    });
+
+    studentAddedSubs.appendChild(createstudentAddedSubject);
+    subject.remove();
+};
+
+
+document.querySelectorAll('.studentAddedSubs .eachSub').forEach(subject => {
+    subject.addEventListener('click', () => {
+        updateAddToAddedSubject(subject);
+    });
+});
+
+            const eachStudentRemoveContainer = document.querySelectorAll('.eachStudentRemoveContainer button')
+
+            eachStudentRemoveContainer.forEach((button)=>{
+                button.addEventListener('click', (event)=>{
+                    event.stopPropagation()
+                    const confirmStudentRemoveModal = document.querySelector('.confirmStudentRemoveModal')
+                    confirmStudentRemoveModal.style.display = 'block'
+
+                    const toBeRemovedStudent = document.querySelector('#toBeRemovedStudent')
+                    
+
+                    fetch(`/${adminId}/getConfirmDeleteStudent?studentID=${encodeURIComponent(button.id)}`).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('There is an error getting student to be deleted.')
+                        }
+                        return response.json()
+                    }).then((data)=>{
+                        toBeRemovedStudent.innerHTML = `${data.foundStudent.name}`
+                    }).catch((e)=>{
+                        console.log(e.message)
+                    })
+
+
+                    const removeStudentExitButton = document.querySelector('#removeStudentExitButton')
+
+                    removeStudentExitButton.addEventListener('click',()=>{
+                    confirmStudentRemoveModal.style.display = 'none'  
+                    })
+
+                    const studentRemoveButtonNo = document.querySelector('#studentRemoveButtonNo')
+                    studentRemoveButtonNo.addEventListener('click',()=>{
+                        studentRemoveButtonNo.style.display = 'none'
+                    })
+
+                    const studentRemoveButtonYes = document.querySelector('#studentRemoveButtonYes')
+                    studentRemoveButtonYes.addEventListener('click',()=>{
+
+                        fetch(`/${adminId}/deleteIndividualStudent?studentID=${encodeURIComponent(button.id)}`,{
+                        method: 'DELETE'
+                    }).then((response)=>{
+                        if(!response.ok){
+                            throw new Error('there is an error deleting individual student.')
+                        }
+                        return response.json()
+                    }).then((data)=>{
+
+                    }).catch((e)=>{
+                        console.log(e.message)
+                    })
+
+                    })
+
+            
+                })
+            })
 
         }).catch((e)=> {
             console.log(`there is an error saying: ${e}`)
@@ -2837,7 +7087,7 @@ removeButton.addEventListener('click',()=> {
     const buttonYesElement = document.querySelector('.buttonYes')
     
     buttonYesElement.addEventListener('click',()=>{
-        const queryString = `/toBeDeleteStudents?department=${encodeURIComponent(departmentValue)}&program=${encodeURIComponent(programValue)}&year=${encodeURIComponent(yearValue)}`
+        const queryString = `/${adminId}/toBeDeleteStudents?department=${encodeURIComponent(departmentValue)}&program=${encodeURIComponent(programValue)}&year=${encodeURIComponent(yearValue)}`
             fetch(queryString, {
         method: 'DELETE', 
     }).then((response)=>{
@@ -2887,8 +7137,10 @@ uploadFile.addEventListener('change', ()=> {
 })
 
 
-        }else if(option.innerHTML === 'Time Frame'){
-            
+        }else if(option.innerHTML === 'Time Frames'){
+            subjectBody.style.display = 'none';
+          
+
            const timeFrameBody = document.createElement('div')
            timeFrameBody.classList.add('timeFrameBody')
 
@@ -3045,7 +7297,64 @@ uploadFile.addEventListener('change', ()=> {
             timeFrameBodyForm.appendChild(timeFrameButtonContainer)
 
             innerRightContainer.appendChild(timeFrameBody)
-        
+
+              
+        fetch(`/${adminId}/getTimeFrame`)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('there is an error getting Time Frame');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const foundTimeFrame = data.foundTimeFrame;
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const startDateElement = document.querySelector('#startDate');
+            startDateElement.value = foundTimeFrame ? formatDate(foundTimeFrame.startDate) : '';
+
+            const endDateElement = document.querySelector('#endDate');
+            endDateElement.value = foundTimeFrame ? formatDate(foundTimeFrame.endDate) : '';
+
+            const startTimeElement = document.querySelector('#startTime');
+            startTimeElement.value = foundTimeFrame ? foundTimeFrame.startTime : '';
+
+            const endTimeElement = document.querySelector('#endTime');
+            endTimeElement.value = foundTimeFrame ? foundTimeFrame.endTime : '';
+
+            const startAcadYearElement = document.querySelector('#startAcadYear');
+            startAcadYearElement.value = foundTimeFrame ? foundTimeFrame.acadYearStart : '';
+
+            const endAcadYearElement = document.querySelector('#endAcadYear');
+            endAcadYearElement.value = foundTimeFrame ? foundTimeFrame.acadYearEnd : '';
+
+            const semElement = document.querySelector('#sem');
+            semElement.value = foundTimeFrame ? foundTimeFrame.semester : '';
+
+            // Enable or disable buttons based on foundTimeFrame
+            const saveButton = document.querySelector('#timeFrameSave');
+            const cancelButton = document.querySelector('#timeFrameCancel');
+
+            if (foundTimeFrame) {
+                saveButton.disabled = true;
+                cancelButton.disabled = false;
+            } else {
+                saveButton.disabled = false;
+                cancelButton.disabled = true;
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+        });
+
+
+
 
           
     document.getElementById('timeFrameForm').addEventListener('submit', function(event) {
@@ -3078,8 +7387,63 @@ uploadFile.addEventListener('change', ()=> {
 
 
 
+document.getElementById('timeFrameCancel').addEventListener('click', async function() {
+    try {
+        // Make the POST request to cancel the time frame
+        const response = await fetch(`/${adminId}/cancelTimeFrame`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-document.getElementById('timeFrameCancel').addEventListener('click', function() {
+        const result = await response.json();
+
+        if (response.ok) {
+            // Re-enable all inputs and save button
+            document.querySelectorAll('#timeFrameForm input, #timeFrameForm select').forEach(el => el.disabled = false);
+            document.getElementById('timeFrameSave').disabled = false;
+            document.getElementById('timeFrameCancel').disabled = true;
+
+            // Clear all input and select values
+            document.querySelectorAll('#timeFrameForm input, #timeFrameForm select').forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = false; // Clear checkboxes and radio buttons
+                } else {
+                    el.value = ''; // Clear other inputs and selects
+                }
+            });
+
+            // Show success message
+            console.log(result.message);
+        } else {
+            // Show error message
+            console.log(result.message || 'Failed to deactivate time frame');
+        }
+    } catch (error) {
+        console.error('Error while canceling time frame:', error);
+        console.log('An error occurred while canceling the time frame');
+    }
+});
+
+/* document.getElementById('timeFrameCancel').addEventListener('click', function() {
+    // Re-enable all inputs and save button
+    document.querySelectorAll('#timeFrameForm input, #timeFrameForm select').forEach(el => el.disabled = false);
+    document.getElementById('timeFrameSave').disabled = false;
+    document.getElementById('timeFrameCancel').disabled = true;
+
+    // Clear all input and select values
+    document.querySelectorAll('#timeFrameForm input, #timeFrameForm select').forEach(el => {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = false; // Clear checkboxes and radio buttons
+        } else {
+            el.value = ''; // Clear other inputs and selects
+        }
+    });
+}); */
+
+
+/* document.getElementById('timeFrameCancel').addEventListener('click', function() {
     fetch(`/${adminId}/deleteTimeFrame`, {
         method: 'DELETE'
     }).then(response => {
@@ -3099,7 +7463,7 @@ document.getElementById('timeFrameCancel').addEventListener('click', function() 
     }).catch(error => {
         console.error('Error:', error);
     });
-});
+}); */
 
 
 
@@ -3146,29 +7510,489 @@ document.getElementById('timeFrameCancel').addEventListener('click', function() 
                 });
             }); */
             
+        }else if(option.innerHTML === 'Subjects'){
+            
+        
+        subjectBody.style.display = 'block';
+        innerRightContainer.appendChild(subjectBody)
+
+        const subjectSelects = document.querySelectorAll('.subjectFilterContainer select')
+        const subjectDep = document.querySelector('#subjectDep')
+        const subjectYear = document.querySelector('#subjectYear')
+        const subjectProgram = document.querySelector('#subjectProgram')
+
+        subjectDep.addEventListener('change',()=>{
+            if(subjectDep.value === 'CET'){
+                 subjectProgram.innerHTML = ''   
+
+                const cetOption1 = document.createElement('option')
+                cetOption1.value = 'BSIT'
+                cetOption1.innerHTML = 'BS IT'
+                subjectProgram.appendChild(cetOption1)
+
+                const cetOption2 = document.createElement('option')
+                cetOption2.value = 'BSCE'
+                cetOption2.innerHTML = 'BS CE'
+                subjectProgram.appendChild(cetOption2)
+
+                const cetOption3 = document.createElement('option')
+                cetOption3.value = 'BSCPE'
+                cetOption3.innerHTML = 'BS CPE'
+                subjectProgram.appendChild(cetOption3)
+
+                const cetOption4 = document.createElement('option')
+                cetOption4.value = 'BSGE'
+                cetOption4.innerHTML = 'BS GE'
+                subjectProgram.appendChild(cetOption4)
+
+               
+
+            }else if(subjectDep.value === 'CBA'){
+
+                subjectProgram.innerHTML = ''   
+
+
+                const cbaOption1 = document.createElement('option')
+                cbaOption1.value = 'BSAHRM'
+                cbaOption1.innerHTML = 'BS AHRM'
+                subjectProgram.appendChild(cbaOption1)
+                
+                const cbaOption2 = document.createElement('option')
+                cbaOption2.value = 'BSBAHM'
+                cbaOption2.innerHTML = 'BS BAMM'
+                subjectProgram.appendChild(cbaOption2)
+                
+                const cbaOption3 = document.createElement('option')
+                cbaOption3.value = 'BSA'
+                cbaOption3.innerHTML = 'BS A'
+                subjectProgram.appendChild(cbaOption3)
+
+               
+            }else if(subjectDep.value === 'CEAA'){
+
+                subjectProgram.innerHTML = ''   
+
+
+                const ceaaOption3 = document.createElement('option')
+                ceaaOption3.value = 'BEE'
+                ceaaOption3.innerHTML = 'B EE'
+                subjectProgram.appendChild(ceaaOption3)
+
+                const ceaaOption1 = document.createElement('option')
+                ceaaOption1.value = 'BSEDFIL'
+                ceaaOption1.innerHTML = 'BSED FILIPINO'
+                subjectProgram.appendChild(ceaaOption1)
+                
+                const ceaaOption2 = document.createElement('option')
+                ceaaOption2.value = 'BSEDVRE'
+                ceaaOption2.innerHTML = 'BSED VRE'
+                subjectProgram.appendChild(ceaaOption2)
+
+                const ceaaOption4 = document.createElement('option')
+                ceaaOption4.value = 'BSEDMATH'
+                ceaaOption4.innerHTML = 'BSED MATHEMATICS'
+                subjectProgram.appendChild(ceaaOption4)
+
+                const ceaaOption5 = document.createElement('option')
+                ceaaOption5.value = 'BAPS'
+                ceaaOption5.innerHTML = 'BA PolSci'
+                subjectProgram.appendChild(ceaaOption5)
+
+                const ceaaOption6 = document.createElement('option')
+                ceaaOption6.value = 'BSEDENG'
+                ceaaOption6.innerHTML = 'BSED ENGLISH'
+                subjectProgram.appendChild(ceaaOption6)
+
+                const ceaaOption7 = document.createElement('option')
+                ceaaOption7.value = 'BSEDVE'
+                ceaaOption7.innerHTML = 'BSED VE'
+                subjectProgram.appendChild(ceaaOption7)
+
+
+
+            }else if(subjectDep.value === 'CHM'){
+
+                subjectProgram.innerHTML = ''   
+
+
+
+                 const chmOption1 = document.createElement('option')
+                chmOption1.value = 'BSHM'
+                chmOption1.innerHTML = 'BS HM'
+                subjectProgram.appendChild(chmOption1)
+
+
+
+            }else if(subjectDep.value === 'CNHS'){
+                 subjectProgram.innerHTML = ''   
+
+
+
+                const cnhsOption1 = document.createElement('option')
+                cnhsOption1.value = 'BSBIO'
+                cnhsOption1.innerHTML = 'BS BIO'
+                subjectProgram.appendChild(cnhsOption1)
+
+                const cnhsOption2 = document.createElement('option')
+                cnhsOption2.value = 'BSN'
+                cnhsOption2.innerHTML = 'BS N'
+                subjectProgram.appendChild(cnhsOption2)
+
+                
+            }else if(subjectDep.value === 'CCJE'){
+                subjectProgram.innerHTML = ''   
+                
+                const ccjeoption1 = document.createElement('option')
+                ccjeoption1.value = 'BSCRIM'
+                ccjeoption1.innerHTML = 'BS CRIM'
+                subjectProgram.appendChild(ccjeoption1)
+
+                
+            }
+
+        })
+      
+        subjectSelects.forEach(select => {
+            select.addEventListener('change',()=>{
+                const subjectDep = document.querySelector('#subjectDep')
+                const subjectYear = document.querySelector('#subjectYear')
+                const subjectProgram = document.querySelector('#subjectProgram')
+
+                const queryString =`/${adminId}/getFilteredSubjects?subjectDep=${encodeURIComponent(subjectDep.value)}&subjectYear=${encodeURIComponent(subjectYear.value)}&subjectProgram=${encodeURIComponent(subjectProgram.value)}`
+                fetch(queryString).then((response)=>{
+                    if(!response.ok){
+                        throw new Error('There is an error fetching filtered subjects')
+                    }
+                    return response.json()
+                }).then((data)=>{
+                    const {foundSubs} = data
+                    const filteredSublist = document.querySelector('.filteredSublist')
+                    filteredSublist.innerHTML=''
+                    
+                    
+                    const addSubjectButton = document.createElement('div')
+                    addSubjectButton.classList.add('addSubjectButton')
+
+                    const addSubjectButtonh1 = document.createElement('h1')
+                    addSubjectButtonh1.innerHTML = '+'
+                    addSubjectButton.append(addSubjectButtonh1)
+                    filteredSublist.appendChild(addSubjectButton)
+
+
+                    foundSubs.forEach((subject)=>{
+                        const eachFilteredSub = document.createElement('div')
+                        eachFilteredSub.classList.add('eachFilteredSub')
+
+                        const eachFilteredSubName = document.createElement('div')
+                        eachFilteredSubName.classList.add('eachFilteredSubName')
+                        eachFilteredSubName.innerHTML = `${subject.name}`
+                        eachFilteredSub.appendChild(eachFilteredSubName)
+
+                        const eachFilteredSubCode = document.createElement('div')
+                        eachFilteredSubCode.classList.add('eachFilteredSubCode')
+                        eachFilteredSubCode.innerHTML = `${subject.code}`
+                        eachFilteredSub.appendChild(eachFilteredSubCode)
+
+                        const eachFilteredSubYear = document.createElement('div')
+                        eachFilteredSubYear.classList.add('eachFilteredSubYear')
+                        eachFilteredSubYear.innerHTML = `${subject.year}`
+                        eachFilteredSub.appendChild(eachFilteredSubYear)
+
+                        const eachFilteredSubProgram = document.createElement('div')
+                        eachFilteredSubProgram.classList.add('eachFilteredSubProgram')
+                        eachFilteredSubProgram.innerHTML = `${subject.program}`
+                        eachFilteredSub.appendChild(eachFilteredSubProgram)
+
+                        const eachFilteredSubButtonContainer = document.createElement('div')
+                        eachFilteredSubButtonContainer.classList.add('eachFilteredSubButtonContainer')
+                        eachFilteredSubButtonContainer.id = 'eachFilteredSubButtonContainer'
+
+
+                        const eachFilteredSubButtonRemove = document.createElement('div')
+                        eachFilteredSubButtonRemove.classList.add('eachFilteredSubButtonRemove')
+                        eachFilteredSubButtonRemove.innerHTML = '-'
+                        eachFilteredSubButtonRemove.id = `${subject.code}`
+                        eachFilteredSubButtonContainer.appendChild(eachFilteredSubButtonRemove)
+
+                        eachFilteredSub.appendChild(eachFilteredSubButtonContainer)
+
+                        filteredSublist.appendChild(eachFilteredSub)
+
+                    })
+
+                    const eachFilteredSub = document.querySelectorAll('.eachFilteredSub')
+                    const updateIndividualSubjectModal = document.querySelector('.updateIndividualSubjectModal')
+                    eachFilteredSub.forEach((subject)=>{
+                        subject.addEventListener('click',()=>{
+                            updateIndividualSubjectModal.style.display = 'block'
+
+                            const updatesubModalExitButton = document.querySelector('#updatesubModalExitButton')
+                            updatesubModalExitButton.addEventListener('click',()=>{
+                                updateIndividualSubjectModal.style.display = 'none'
+                                
+                            })
+
+                            fetch(`/:adminId/getSubjectInfo?subjectName=${encodeURIComponent(subject.firstChild.innerHTML)}`)
+                            .then((response)=>{
+                                if(!response.ok){
+                                    throw new Error('There is an error getting info of the subject')
+                                }
+                                return response.json()
+                            }).then((data)=>{
+                                const subjectNameUpdate = document.querySelector('#subjectNameUpdate')
+                                const subjectCodeUpdate = document.querySelector('#subjectCodeUpdate')
+                                const subDepSelect = document.querySelector('#updateSubDepSelect')
+                                const subProgSelect = document.querySelector('#updateSubProgSelectUpdate')
+                                const subYearSelectUpdate = document.querySelector('#updateSubYearSelectUpdate')
+                                subjectNameUpdate.value = data.name
+                                subjectCodeUpdate.value = data.code
+                                subDepSelect.value = data.department[0]
+                                subYearSelectUpdate.value = data.year
+                                if(subDepSelect.value === 'CET'){
+                                const cetPrograms = ['BSIT','BSCPE', 'BSCE','BSGE']
+                                subProgSelect.innerHTML =''
+                                cetPrograms.forEach(program=>{
+                                    let cetOption = document.createElement('option')
+                                    cetOption.value = program
+                                    cetOption.innerHTML = program
+                                    subProgSelect.appendChild(cetOption)
+                                })
+                                
+                            }else if(subDepSelect.value === 'CBA'){
+                                const cbaPrograms = ['BSAHRM', 'BSBAMM','BSA']
+                                subProgSelect.innerHTML =''
+                                cbaPrograms.forEach(program=>{
+                                    let cbaOption = document.createElement('option')
+                                    cbaOption.value = program
+                                    cbaOption.innerHTML = program
+                                    subProgSelect.appendChild(cbaOption)
+                                })
+                            }else if(subDepSelect.value === 'CEAA'){
+                                const ceaaPrograms = ['BEE', 'BSEDFIL','BSEDVRE', 'BSEDMATH', 'BAPS', 'BSEDENG','BSEDVE']
+                                subProgSelect.innerHTML =''
+                                ceaaPrograms.forEach(program=>{
+                                    let ceaaOption = document.createElement('option')
+                                    ceaaOption.value = program
+                                    ceaaOption.innerHTML = program
+                                    subProgSelect.appendChild(ceaaOption)
+                                })
+                            }else if(subDepSelect.value === 'CHM'){
+                                const chmPrograms = ['BSHM']
+                                subProgSelect.innerHTML =''
+                                chmPrograms.forEach(program=>{
+                                    let chmOption = document.createElement('option')
+                                    chmOption.value = program
+                                    chmOption.innerHTML = program
+                                    subProgSelect.appendChild(chmOption)
+                                })
+                            }else if(subDepSelect.value === 'CNHS'){
+                                const cnhsPrograms = ['BSN', 'BSBIO']
+                                subProgSelect.innerHTML =''
+                                cnhsPrograms.forEach(program=>{
+                                    let cnhsOption = document.createElement('option')
+                                    cnhsOption.value = program
+                                    cnhsOption.innerHTML = program
+                                    subProgSelect.appendChild(cnhsOption)
+                                })
+                            }else if(subDepSelect.value === 'CCJE'){
+                                const ccjePrograms = ['BSCRIM']
+                                subProgSelect.innerHTML =''
+                                ccjePrograms.forEach(program=>{
+                                    let ccjeOption = document.createElement('option')
+                                    ccjeOption.value = program
+                                    ccjeOption.innerHTML = program
+                                    subProgSelect.appendChild(ccjeOption)
+                                })}
+                                
+
+                                console.log(data)
+                            }).catch((error)=>{
+                                console.log(error.message)
+                            })
+                        })
+                    })
+                    const eachFilteredSubButtonRemove = document.querySelectorAll('.eachFilteredSubButtonRemove')
+                    
+                    eachFilteredSubButtonRemove.forEach((button)=>{
+                        button.addEventListener('click', ()=>{
+                            const confirmSubRemoveModal = document.querySelector('.confirmSubRemoveModal')
+                            confirmSubRemoveModal.style.display = 'block'
+                            
+                            const removeSubExitButton = document.querySelector('#removeSubExitButton')
+                            removeSubExitButton.addEventListener('click', ()=>{
+                                confirmSubRemoveModal.style.display = 'none'
+
+                            })
+                            const subRemoveButtonNo = document.querySelector('#subRemoveButtonNo')
+                            subRemoveButtonNo.addEventListener('click',()=>{
+                                confirmSubRemoveModal.style.display = 'none'
+                            })
+
+
+                            const toBeRemovedSub = document.querySelector('#toBeRemovedSub')
+                            toBeRemovedSub.innerHTML = button.id
+                            
+
+
+                            const subRemoveButtonYes = document.querySelector('#subRemoveButtonYes')
+
+                            subRemoveButtonYes.addEventListener('click',()=>{
+                                fetch(`/${adminId}/deleteIndividualSubject?subjectCode=${encodeURIComponent(button.id)}`, {
+                                    method: 'DELETE'
+                                }).then((response)=>{
+                                    if(!response.ok){
+                                        throw new Error('There is an error deleting individual subject')                                    
+                                    }
+                                    return response.json()
+
+                                }).then((data)=>{
+
+                                }).catch((e)=>{
+                                    console.log(e.message)
+                                })
+                            })
+
+                            
+                        })
+                    })
+
+                        const subModalExitButton = document.querySelector('#subModalExitButton')
+
+                    addSubjectButton.addEventListener('click',()=>{
+                        addIndividualSubjectModal.style.display = 'block'
+                        subModalExitButton.addEventListener('click',()=>{
+                        addIndividualSubjectModal.style.display = 'none'  
+                        })
+
+                        const subDepSelect = document.querySelector('#subDepSelect')
+                        subDepSelect.addEventListener('change', ()=>{
+                            const subProgSelect =document.querySelector('#subProgSelect')
+
+                            if(subDepSelect.value === 'CET'){
+                                const cetPrograms = ['BSIT','BSCPE', 'BSCE','BSGE']
+                                subProgSelect.innerHTML =''
+                                cetPrograms.forEach(program=>{
+                                    let cetOption = document.createElement('option')
+                                    cetOption.value = program
+                                    cetOption.innerHTML = program
+                                    subProgSelect.appendChild(cetOption)
+                                })
+                            }else if(subDepSelect.value === 'CBA'){
+                                const cbaPrograms = ['BSAHRM', 'BSBAMM','BSA']
+                                subProgSelect.innerHTML =''
+                                cbaPrograms.forEach(program=>{
+                                    let cbaOption = document.createElement('option')
+                                    cbaOption.value = program
+                                    cbaOption.innerHTML = program
+                                    subProgSelect.appendChild(cbaOption)
+                                })
+                            }else if(subDepSelect.value === 'CEAA'){
+                                const ceaaPrograms = ['BEE', 'BSEDFIL','BSEDVRE', 'BSEDMATH', 'BAPS', 'BSEDENG','BSEDVE']
+                                subProgSelect.innerHTML =''
+                                ceaaPrograms.forEach(program=>{
+                                    let ceaaOption = document.createElement('option')
+                                    ceaaOption.value = program
+                                    ceaaOption.innerHTML = program
+                                    subProgSelect.appendChild(ceaaOption)
+                                })
+                            }else if(subDepSelect.value === 'CHM'){
+                                const chmPrograms = ['BSHM']
+                                subProgSelect.innerHTML =''
+                                chmPrograms.forEach(program=>{
+                                    let chmOption = document.createElement('option')
+                                    chmOption.value = program
+                                    chmOption.innerHTML = program
+                                    subProgSelect.appendChild(chmOption)
+                                })
+                            }else if(subDepSelect.value === 'CNHS'){
+                                const cnhsPrograms = ['BSN', 'BSBIO']
+                                subProgSelect.innerHTML =''
+                                cnhsPrograms.forEach(program=>{
+                                    let cnhsOption = document.createElement('option')
+                                    cnhsOption.value = program
+                                    cnhsOption.innerHTML = program
+                                    subProgSelect.appendChild(cnhsOption)
+                                })
+                            }else if(subDepSelect.value === 'CCJE'){
+                                const ccjePrograms = ['BSCRIM']
+                                subProgSelect.innerHTML =''
+                                ccjePrograms.forEach(program=>{
+                                    let ccjeOption = document.createElement('option')
+                                    ccjeOption.value = program
+                                    ccjeOption.innerHTML = program
+                                    subProgSelect.appendChild(ccjeOption)
+                                })
+                            }
+                        })
+
+
+                    })
+
+
+                }).catch((e)=>{
+                    console.log(e.message)
+                })
+            })
+        })
+
+        
         }else{
             console.log('There is an error.')
-
         }
 
     })
 }
 
 
+function addSubjectToAddedSubjects(subject) {
+    const hiddenInput = document.querySelector('#hiddenInput')
+    const addedSubjectsElement = document.querySelector('.addedSubjects')
 
+    const eachSub = document.createElement('div');
+    eachSub.classList.add('eachSub');
+    eachSub.textContent = subject.code;
 
+    const exitButton = document.createElement('div');
+    exitButton.classList.add('exitButton');
+    exitButton.textContent = '+';
+    eachSub.appendChild(exitButton);
 
+    addedSubjectsElement.appendChild(eachSub);
+
+    exitButton.addEventListener('click', () => {
+        eachSub.remove();
+        addSubjectToToBeAddedSubjects(subject);
+
+        updateHiddenInput(hiddenInput, subject.code, 'remove');
+    });
+}
+function addSubjectToToBeAddedSubjects(subject) {
+    const hiddenInput = document.querySelector('#hiddenInput')
+    const tobeAddedSubElement = document.querySelector('.toBeAddedSubjects')
+    const eachToBeAddedSub = document.createElement('div');
+    eachToBeAddedSub.classList.add('eachToBeAddedSub');
+    eachToBeAddedSub.textContent = subject.code;
+
+    tobeAddedSubElement.appendChild(eachToBeAddedSub);
+
+    eachToBeAddedSub.addEventListener('click', () => {
+        eachToBeAddedSub.remove();
+        addSubjectToAddedSubjects(subject);
+
+        updateHiddenInput(hiddenInput, subject.code, 'add');
+    });
+}
 function updateHiddenInput(input, code, action) {
-        let currentValues = input.value ? input.value.split(',') : [];
-            if (action === 'add') {
-                if (!currentValues.includes(code)) {
-                    currentValues.push(code);
-                }
-            } else if (action === 'remove') {
-                currentValues = currentValues.filter((value) => value !== code);
-            }
-        input.value = currentValues.join(',');
+    let currentValues = input.value ? input.value.split(',') : [];
+    if (action === 'add') {
+        if (!currentValues.includes(code)) {
+            currentValues.push(code);
+        }
+    } else if (action === 'remove') {
+        currentValues = currentValues.filter(value => value !== code);
     }
+    input.value = currentValues.join(',');
+}
 
 
 

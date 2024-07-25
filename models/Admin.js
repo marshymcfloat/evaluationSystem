@@ -9,15 +9,17 @@ mongoose.connect('mongodb://127.0.0.1:27017/evaluatePrac').then(()=> {
 
 const adminSchema = new mongoose.Schema({
     adminID : {
-        type: Number,
-        minLength: 10,
-        maxLength: 10,
+        type: String,
         required: true
         
     },
-    hasNoAccount: {
-        type: Boolean,
-        default: true
+    password:{
+        type: String,
+        required: true
+    },
+    hasChangedPassword:{
+        type:Boolean,
+        default: false
     }
 
 })
@@ -25,7 +27,8 @@ const adminSchema = new mongoose.Schema({
 const Admin = mongoose.model('Admin', adminSchema)
 
 /* const newAdmin = new Admin({
-    adminID: 1234567890
+    adminID: '111111',
+    password:'Ph83aL'
 })
 
  newAdmin.save()

@@ -9,27 +9,45 @@ mongoose.connect('mongodb://127.0.0.1:27017/evaluatePrac').then(()=> {
 const evaluationsSchema = new mongoose.Schema({
     IDstudent: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student'
+        ref: 'Student',
+        required: true
     },
     IDquestions: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question'
+        ref: 'Question',
+        required: true
     },
     IDinstructor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Instructor'
+        ref: 'Instructor',
+        required: true
     }, 
     IDsubject:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subject'
+        ref: 'Subject',
+        required: true
     },
     answer: {
-        type: String
+        type: String,
+        required: true
     }
     ,questionCategory:{
-        type: String
+        type: String,
+        required: true
+    },
+    academicYear:{
+        type: String,
+        required: true
+    },
+    semester:{
+        type: String,
+        enum: ['1st','2nd', '3rd'],
+        required: true
+    },department:{
+        type: String,
+        required: true
     }
-
+    
 })
 
 const Evaluation = mongoose.model('Evaluation', evaluationsSchema)

@@ -19,7 +19,6 @@ const studentSchema = new mongoose.Schema({
     },
     program: {
         type: String,
-        enum: ["BSIT", "BSGE", "BSCPE", "BSCE", 'BSN'],
         required: true
     },
     yearLevel: {
@@ -29,13 +28,24 @@ const studentSchema = new mongoose.Schema({
     department:{
         type: String,
         enum: ["CET", 'CCJE', 'CNHS', 'CBA', 'CEAA', 'CHM']
-    }, hasNoAccount: {
+    }, hasVoted: {
         type: Boolean,
-        default: true
+        default: false
     }, subjectsEnrolled: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Subject'
+    },password:{
+        type: String,
+        required: true
+    },
+    evaluatedSubjects:{
+        type: [ mongoose.Schema.Types.ObjectId],
+        ref: 'Subject'
+    },
+    email:{
+        type: String
     }
+    
 })
 
 const Student = mongoose.model('Student', studentSchema)

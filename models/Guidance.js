@@ -9,6 +9,14 @@ mongoose.connect('mongodb://127.0.0.1:27017/evaluatePrac').then(()=> {
 const guidanceSchema = new mongoose.Schema({
     guidanceID:{
         type: String,
+    },
+    password:{
+        type: String,
+        required: true
+    },
+     hasChangedPassword:{
+        type:Boolean,
+        default: false
     }
 })
 
@@ -18,6 +26,7 @@ const Guidance = mongoose.model('Guidance', guidanceSchema)
 module.exports = Guidance
 
 /* const newGuidance = new Guidance({
-    guidanceID: '700001'
+    guidanceID: '700001',
+    password:'T2dC7m'
 })
 newGuidance.save() */

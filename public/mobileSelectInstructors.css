@@ -116,7 +116,33 @@ body{
     font-size: 12px;
 }
 
+#logout-form {
+    position: absolute;
+    bottom: 6px;
+    right: 40px;
+    cursor: pointer;
+}
 
+#logout-form button{
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;
+}
+.disabled {
+    color: gray;
+    pointer-events: none;
+    cursor: default;
+}
+
+#evaluateMark {
+    color: #55854d;
+}
 
 
 

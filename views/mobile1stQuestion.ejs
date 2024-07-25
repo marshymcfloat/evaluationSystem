@@ -9,7 +9,7 @@
             <div class="leftStripe"></div>
 
             <div class="mainForm">
-                <form action="/<%=studentID%>/instructors/<%=teacherID%>/<%=subjectcode%>/evaluate" method="POST">
+                <form  id="evaluation-form" action="/<%=studentID%>/instructors/<%=teacherID%>/<%=subjectcode%>/evaluate" method="POST">
                     <div class="questionCategoryContainer">
                         <div class="questionCategoryName">
                             <span>Course Overview and Orientation</span>
@@ -273,13 +273,30 @@
                                 <%})%>
                     </div>
                     <div class="submitButton">
-                        <button>Done</button>
+                        <button id="submit-btn" type="submit" disabled>Done</button>
                     </div>
                 </form>
         </div>
        
         <div class="rightStripe"></div>
         <div class="rightStripe2"></div>
+
+
+        <div id="review-modal">
+            <div class="modal-content">
+                <h2>Review Your Answers</h2>
+                <div id="review-answers">
+                  
+                </div>
+                <div class="modal-buttons">
+                    <button id="cancel-btn">Cancel</button>
+                    <button id="confirm-btn">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+    <script src="/js/studentQuestions.js"></script>
+
     </body>
 
 

@@ -1,5 +1,5 @@
 
-<%- include('partials/head.ejs') %>
+<!-- <%- include('partials/head.ejs') %>
 
 
 <link rel="stylesheet" href="/mobileSelectInstructors.css">
@@ -23,12 +23,58 @@
                     </div>
                     <% }) %>
             </div>
+            
+            <form id="logout-form" action="/logout" method="POST" style="display: inline;">
+                <button type="submit">Logout</button>
+            </form>
         </div>
 
         <div class="rightStripe"></div>
         <div class="rightStripe2"></div>
     </div>
+<script src="/js/selectInstructors.js"></script>
+
 </body>
 
 
-</html>
+</html> -->
+
+<%- include('partials/head.ejs') %>
+
+    <link rel="stylesheet" href="/mobileSelectInstructors.css">
+
+    <body>
+        <div class="formBody">
+            <div class="leftStripe"></div>
+            <div class="leftStripe"></div>
+
+            <div class="mainForm">
+                <h1>Select Instructors</h1>
+                <div class="teacherListContainer">
+                    <% teacherSubjectPairs.forEach(pair=> { %>
+                        <div class="eachTeacher">
+                            <a href="http://localhost:3100/<%= studentId %>/instructors/<%= pair._id %>/<%= pair.subject.code %>/evaluate"
+                                class="<%= pair.isEvaluated ? 'disabled' : '' %>">
+                                <p>
+                                    <%= pair.fullname %>
+                                </p>
+                            </a>
+                            <span><%= pair.subject.code %></span>
+                            <% if (pair.isEvaluated) { %>
+                                <span id="evaluateMark">&#10004;</span>
+                                <% } %>
+                        </div>
+                        <% }) %>
+                </div>
+
+                <form id="logout-form" action="/logout" method="POST" style="display: inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+
+            <div class="rightStripe"></div>
+            <div class="rightStripe2"></div>
+        </div>
+    </body>
+
+    </html>

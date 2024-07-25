@@ -27,7 +27,7 @@ const instructorsSchema = new mongoose.Schema({
 },
     subjects: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'Subject'
+        ref: 'Subject'  
     },
 })
 
